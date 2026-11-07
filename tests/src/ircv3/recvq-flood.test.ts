@@ -18,7 +18,9 @@ import {
  *             abuse) are no longer exploitable.
  *
  * Pin the cap behavior at the level the plan promises:
- *   - Tag region: 4095 bytes (client direction) hard-kill on overrun.
+ *   - Tag region: a line over a client's 4095 bytes gets ERR_INPUTTOOLONG
+ *     (417) and the client stays, as message-tags requires; past
+ *     8189 bytes (what still reads as one line) the connection is killed.
  *   - Msg region: FULL_MSG_SIZE (4096) hard-kill on overrun.
  *   - Sustained flood: get_recvq() raw, no per-CAP boost arithmetic.
  *   - Multiline cap continues to live in m_batch.c as MULTILINE_MAX_BYTES FAIL.
@@ -26,6 +28,7 @@ import {
  */
 
 const TAG_CLIENT_CAP = 4095;
+const TAG_KILL_CAP = 8189; // FULL_MSG_SIZE - BUFSIZE - 2
 const FULL_MSG_SIZE = 12287; // IRCV3_TAG_MAX (8191) + BUFSIZE (4096)
 
 /** Wait until the socket has closed (server kill) OR a timeout elapses. */
@@ -68,7 +71,7 @@ describe('per-class recvQ flood enforcement', () => {
     poolAccounts.length = 0;
   });
 
-  it('kills mid-line on >4095 tag bytes from CAP-active client', async () => {
+  it('answers >4095 tag bytes with 417 and keeps the client', async () => {
     const client = track(
       await createRawSocketClient(PRIMARY_SERVER.host, PRIMARY_SERVER.port),
     );
@@ -78,17 +81,35 @@ describe('per-class recvQ flood enforcement', () => {
     client.register(uniqueNick('flood'));
     await client.waitForNumeric('001');
 
-    // '@' + 4097 'x' = 4098 bytes of tag region.  No terminator —
-    // we expect the kill to fire mid-line.
-    const huge = '@' + 'x'.repeat(4097);
-    client.send(huge); // RawSocketClient appends \r\n; we want NO terminator
-    // RawSocketClient send() may add \r\n; we instead want to push raw
-    // bytes.  Probe how send() handles this by also explicitly closing
-    // with no terminator: even if \r\n was added, the 4098 bytes of
-    // tag region were already over cap before the terminator.
+    // '@' + 'k=' + 4093 chars of value = 4096 total tag region, one over.
+    const line = `@k=${'x'.repeat(4093)} PING :dropped`;
+    expect(line.indexOf(' ')).toBe(TAG_CLIENT_CAP + 1);
+    client.send(line);
+    await client.waitForNumeric('417', 3000);
+
+    // The line was dropped, not the connection.
+    client.send('PING :after');
+    const pong = await client.waitForCommand('PONG', 3000);
+    expect(pong.raw).toContain('after');
+    expect(client.allLines.some(l => /dropped/.test(l))).toBe(false);
+  });
+
+  it('kills mid-line on >8189 tag bytes from CAP-active client', async () => {
+    const client = track(
+      await createRawSocketClient(PRIMARY_SERVER.host, PRIMARY_SERVER.port),
+    );
+    await client.capLs();
+    await client.capReq(['message-tags']);
+    client.capEnd();
+    client.register(uniqueNick('flood'));
+    await client.waitForNumeric('001');
+
+    // '@' + 8190 'x' = 8191 bytes of tag region: over the cap before
+    // any terminator send() adds.
+    client.send('@' + 'x'.repeat(TAG_KILL_CAP + 1));
 
     const closed = await waitForClose(client, 5000);
-    expect(closed, `expected server-side kill on >4095 byte tag region.\nLines: ${client.allLines.join('\n')}`).toBe(true);
+    expect(closed, `expected server-side kill on >8189 byte tag region.\nLines: ${client.allLines.join('\n')}`).toBe(true);
     expect(client.allLines.some(l => /tag region/.test(l))).toBe(true);
   });
 
