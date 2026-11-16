@@ -2,13 +2,15 @@ An integer feature was read with `strtoul()` straight into an int, with no check
 
 **The fix:**
 - Integer values go through a new `ircd_strtoint()`. It takes what `strtol()` with base 0 takes and allows white space around the number. It refuses an empty string, trailing junk and anything outside an int.
-- A refused value leaves the feature as it was. It is reported the way a bad boolean is: `ERR_BADFEATVALUE` to an oper's SET, and a CONFIG error from ircd.conf.
-- The custom-feature (`FEAT_NONE`) case used to fall through into the integer code whenever its set handler returned 0, which `feature_log_set()` does for every `"LOG" = "SUBSYSTEM" ...` line. That stored junk in an unused `v_int`. With the new check it would have reported every such line as a bad value, so the case now ends with its own `break`.
+- A refused value leaves the feature as it was, including across a REHASH: a kept value that isn't the default stays marked, so `feature_mark()` doesn't reset it. It is reported the way a bad boolean is: `ERR_BADFEATVALUE` to an oper's SET, and a CONFIG error from ircd.conf.
+- Only a real integer feature's value is checked. The custom-feature (`FEAT_NONE`) case still falls through into this code when its set handler returns 0, exactly as before. For `"LOG" = "<subsystem>" ...` lines that clears LOG's mark, which `log_feature_mark()` relies on to keep the default syslog facility. A first version of this PR added a `break` there, and review showed it would have reset a configured facility at every load. That interplay is left for a separate change to `log_feature_mark()`.
+- `doc/example.conf`'s commented `"HIS_REMOTE" = "TRUE"` (an integer feature, which `"TRUE"` read as 0) now reads `"1"`.
 
 **Testing:**
 - Unit test: new `ircd_strtoint` cases (in `ircd_string_cmocka` on ircv3.2-upgrade, in `ircd_string_t` on master) for valid values, out-of-range values and junk.
 - Running servers, with `MAXCHANNELSPERUSER "4294967303"`, `NICKLEN "4294967296"`, `CHANNELLEN "100junk"` and `MAXSILES "17"`, plus LOG lines:
   - The old build refuses every nick with 432.
   - The new build logs three bad values and keeps their defaults (NICKLEN=15, CHANNELLEN=200, MAXCHANNELS=20). It applies SILENCE=17 and reports nothing for the LOG lines.
+- NICKLEN 30, then a REHASH with `"NICKLEN" = "30x"`: the first version reset it to 15; now it stays 30.
 
 The same change is opened against ircv3.2-upgrade separately.
