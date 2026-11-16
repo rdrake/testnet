@@ -1,0 +1,2 @@
+
+**Added since opening:** after a GitSync-triggered rehash is abandoned, GitSync used to restore the file and run a second full rehash to put things back. That second pass is no longer needed. `conf_rehash_abandoned()` reports the abandon, and GitSync restores the file and runs the quiet `conf_file_check()` instead. If that check cannot run, it falls back to the rehash. Checked with strace: the configuration is no longer loaded a second time.

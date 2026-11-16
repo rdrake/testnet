@@ -1,0 +1,2 @@
+
+**Added since opening:** the responder refuses an empty `msgid=` or `timestamp=` too, so an older requester's empty reference is not run as a query either. `chathistory_ref_cmocka` checks this.

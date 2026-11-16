@@ -1,0 +1,1 @@
+Not changed here: REDACT and the S2S lookups can still target a dead incarnation's row, and the S2S reference parser still accepts an empty `msgid=`. Those are separate issues.

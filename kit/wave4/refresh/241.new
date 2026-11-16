@@ -1,0 +1,1 @@
+**Added since opening:** a new `history_lookup_live_message()` is used by AROUND, by REDACT's lookup and by the `CH Q X` lookup, so none of them can reach a row from a channel's dead incarnation. On a running server, the old build redacted a row from the previous incarnation; the new build answers `FAIL REDACT UNKNOWN_MSGID`. The S2S parser's empty `msgid=` is handled in #240.

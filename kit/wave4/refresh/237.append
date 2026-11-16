@@ -1,0 +1,4 @@
+
+**Added since opening:**
+- With `ASYNC_LOGGING` on, queued lines went to syslog with the file's timestamp and a trailing newline. Each queued entry now records where its message starts, and both the writer thread and the synchronous fallback give syslog only the message. `log_async_cmocka` checks the syslog text.
+- `log_async_cmocka` also gains a case for a spurious wakeup while the ring is full: it must not be taken as room.
