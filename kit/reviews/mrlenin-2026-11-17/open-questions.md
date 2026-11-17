@@ -1,70 +1,178 @@
-# nefarious2 draft PRs: open questions (2026-11-17)
+# nefarious2 draft PRs: open questions (updated 2026-11-17 20:10 UTC)
 
-Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-17 review round. Each PR already does the option marked **(current)**, so nothing is blocked; changing a choice is a follow-up commit.
+Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
-## #242 chathistory: SEARCH and timestamp parsing
-1. **Decided (2026-11-17):** a timestamp with an explicit zero offset (`+00:00`) stays refused with `FAIL ... INVALID_PARAMS`. `extensions/chathistory.md:67` says a `timestamp` parameter MUST have the format `timestamp=YYYY-MM-DDThh:mm:ss.sssZ`; ibutsu agrees it is a spec violation and a matter of strictness. The #242 description says so.
-   - **Done (2026-11-17, 1ec4bc92):** following the spec all the way: a client timestamp is taken only as exactly `YYYY-MM-DDThh:mm:ss.sssZ` (three fractional digits, uppercase `T`/`Z`, fields in range, seconds to 60 for a leap second) in CHATHISTORY, SEARCH and MARKREAD. A missing `Z` or fraction, or a fraction of another length, is now refused too.
+**How to read this:**
+- Every item has a stable ID (`Q1`…`Q16`) and exactly one status line: `Status: 🟡 OPEN` (needs an answer) or `Status: ✅ RESOLVED` (decided and done or in progress).
+- Open items come first. Resolved items stay below for the record and are never deleted.
+- To answer one, reply with its ID and the option you want.
 
-## #245 bouncer: rollback keeps a newer build's session records
-2. A session live when a newer build crashed, after which an older build ran and the newer build came back:
-   - expire it at the roll-forward **(current)**;
-   - keep holding it from the crash (needs the older build to keep the newer one's last heartbeat, e.g. under a per-writer key `bouncer/alive/<writer>`).
-3. At restore, a session whose nick another account's restored session holds:
-   - skip it; its record stays until its hold ends **(current)**;
-   - restore it under a fallback nick.
+## Summary
 
-## #246 / #247 rehash: a configuration with errors abandons the rehash
-4. The mechanism:
-   - a child-process check (`ircd -k` in a fresh process) **(current)**;
-   - parse into staged structures, swapped in only on success;
-   - an in-process syntax-only pass (catches syntax errors and missing includes, not semantic ones).
-5. If the child process stays (#246 only), what GitSync does when the check itself crashes or cannot run:
-   - refuse the commit after one crash **(current)**;
-   - treat the result as unknown and proceed;
-   - refuse only after a second failure.
+| ID | PR | Question | Status |
+|----|----|----------|--------|
+| Q2 | #245 | Session live at a newer build's crash: expire or keep holding? | 🟡 OPEN |
+| Q3 | #245 | Restored session whose nick another account holds: skip or fallback nick? | 🟡 OPEN |
+| Q4 | #246/#247 | Rehash pre-check mechanism | 🟡 OPEN |
+| Q5 | #246 | GitSync when the check itself crashes | 🟡 OPEN |
+| Q9 | #253 | Must Seance #327 ship before `PERSISTENCE_DRAFT_EXTRAS` goes FALSE? | 🟡 OPEN |
+| Q11 | #261 | Split into three PRs? | 🟡 OPEN |
+| Q12 | #261 | Does `sslfp = ""` mean "no fingerprint required"? | 🟡 OPEN |
+| Q14 | #289 | Offer the old `evilnet/channel-relocate` name for a transition release? | 🟡 OPEN |
+| Q15 | #280 | Fix shape for a services rename of a bouncer session's account | 🟡 OPEN |
+| Q16 | testnet | Is `testnet-svc/data/x3.conf` meant to be used, or stale? | 🟡 OPEN |
+| Q1 | #242 | Accept `+00:00` timestamps? | ✅ RESOLVED: no, spec form only |
+| Q6 | #252 | Which channels a no-`in=` SEARCH federates; scan cost | ✅ RESOLVED: keep scope, scan to the thread pool |
+| Q7 | #253 | Extras as `PERSISTENCE` subcommands or their own command? | ✅ RESOLVED: subcommands |
+| Q8 | #253 | Does cap-less use of the extras end? | ✅ RESOLVED: never |
+| Q10 | #253 | Capability name form | ✅ RESOLVED: `evilnet.github.io/persistence` |
+| Q13 | #253 | Cap-gating unsolicited output (restore batch, SET line) | ✅ RESOLVED: gated |
+| Q17 | #289 | Move old vendor names to the DNS form? | ✅ RESOLVED: yes, draft #289 |
 
-## #252 chathistory: SEARCH without `in=` asks the other storage servers
-6. Which channels a no-`in=` SEARCH federates (each part costs every storage peer a full scan in its main loop, about 2 s for 8 channels of 50 000 rows):
-   - all of the requester's channels within the PR's bounds, at most 8 **(current)**;
-   - only channels whose window this server did not fully receive (`channel_range_check()`, as pages already use);
-   - all of them, sharing one scan budget across the parts (e.g. a `max=<n>` selector that older responders ignore);
-   - a lower `SEARCH_FED_PARTS_MAX`, or fake lag charged per part.
-   - **Dev input (ibutsu, 2026-11-17):** "rocksdb reads are thread safe and we can use the threadpool for them". So the scan could move off the main loop: a `thread_pool_submit()` worker walks the store, and the callback filters and replies on the main thread. That removes the ~2 s stall whichever channels federate.
-   - **In progress (2026-11-17):** moving the SEARCH store walk to the thread pool.
-   - **Decided (2026-11-17):** the thread-pool scan goes in a separate follow-up PR built on #252 (in progress); #252 keeps its current scope (up to 8 channels).
+---
 
-## #253 persistence: the extras move to `evilnet.github.io/persistence`
-7. Do the extras (ATTACH, DETACH, LIST, PROFILE, REPLAY) stay `PERSISTENCE` subcommands under the vendor capability **(current)**, or move to a vendor command of their own?
-   - **Dev input (ibutsu, 2026-11-17):** "the proposed spec says unknown subcommands should be ignored, so it allows for extending really." This supports keeping the extras as `PERSISTENCE` subcommands.
-   - **Decided (2026-11-17): they stay `PERSISTENCE` subcommands.** The draft: "Implementations SHOULD ignore unrecognized subcommands, to be compatible with future extensions of this specification." No code change.
-8. Does cap-less use of the extras end with this change, or only when `PERSISTENCE_DRAFT_EXTRAS` goes FALSE **(current)**?
-   - **Dev input (ibutsu, 2026-11-17):** "Not allowing the command without the cap blocks bouncer users without the CAP from adjusting the auto-replay, so that's something to consider." At #253's head (e10e4c08), `REPLAY` (the auto-replay setting) is one of the gated extras (`persistence_extras_allowed()`, `ircd/m_persistence.c:1009`, gate at `:1051`). So once `PERSISTENCE_DRAFT_EXTRAS` is FALSE, a client without `evilnet.github.io/persistence` cannot change auto-replay.
-   - **Decided (2026-11-17, c70cd604): cap-less use never ends.** The extras are reachable by every connection, whatever the caps and the flag. The gate protected nothing: each extra requires the account and acts only on that account's own sessions and settings, and a cap is not a credential. `evilnet.github.io/persistence` now announces the extras and names the restore batch type; `PERSISTENCE_DRAFT_EXTRAS` controls only the old names (the value on `draft/persistence` and the `draft/persistence` batch type).
-9. Ordering with Seance: should evilnet/seance#327 merge and deploy before `PERSISTENCE_DRAFT_EXTRAS` is turned off? (While it is on, Seance develop sees no change.)
-   - **Second opinion (review, 2026-11-17):** #253 can merge first. With `PERSISTENCE_DRAFT_EXTRAS` TRUE, Seance develop sees no change: the old batch type for connections without the vendor cap, and the value still on `draft/persistence`. Turn the flag FALSE only once evilnet/seance#327 is in every shipped Seance build (web, phone, desktop); otherwise develop loses restore recognition and `attach-cursor`. #327 is 8 commits behind develop and needs a rebase before it merges.
-   - **Dev input (ibutsu, 2026-11-17):** "the general rule of thumb is that anything that has the server send unsolicited messages the client may not understand must be CAP gated. I kinda broke this rule a little with the persistence batch, but there's some gray area there since clients are supposed to ignore batch types they don't understand." Ungating the extras fits the rule: they only answer the client's own commands. The one unsolicited item is the restore batch, gated on `batch` alone (pre-existing; #253 only renames its type).
-   - **Decided (2026-11-17, 1b414b16), following that rule:** the restore batch is wrapped only for a connection with `evilnet.github.io/persistence` (vendor type) or, while `PERSISTENCE_DRAFT_EXTRAS` is on, any `batch` client (old type, as before); otherwise the lines go out unwrapped. The non-spec `PERSISTENCE SET <state>` line before a SET's STATUS goes only to a vendor-cap connection or while the flag is on.
-10. **Decided (2026-11-17):** the capability's name is `evilnet.github.io/persistence`. Vendor-specific capability names "are prefixed by a valid DNS domain name" (`extensions/capability-negotiation.md:510`, cited by ibutsu), which `evilnet/<name>` is not.
-- **Dev input (ibutsu, 2026-11-17), general rule:** "anything that has the server send unsolicited messages the client may not understand must be CAP gated. I kinda broke this rule a little with the persistence batch, but there's some gray area there since clients are supposed to ignore batch types they don't understand." At c70cd604 the restore batch is gated on `batch` only (`bouncer_session.c:18448-18451`). Its type is the vendor name for a connection with the vendor cap, or for every connection once `PERSISTENCE_DRAFT_EXTRAS` is FALSE (`:18460-18463`), even when `CAP_evilnet_persistence` is off and no client can negotiate it.
+# 🟡 OPEN: needs an answer
 
-## #261 res, ssl, nick: three small inherited bugs
-11. Split it into three PRs, one per bug?
-12. Should `sslfp = ""` in a block mean "no fingerprint required"?
+### Q2 · #245 bouncer: rollback keeps a newer build's session records
+Status: 🟡 OPEN
 
-## Vendor name prefixes on ircv3.2-upgrade
-- **Decided (2026-11-17): both move to the DNS form**, in draft PR evilnet/nefarious2#289 (branch `fix/vendor-cap-name`):
-  - the capability `evilnet/channel-relocate` becomes `evilnet.github.io/channel-relocate` (`capability-negotiation.md:510`). The feature `CAP_evilnet_channel_relocate` keeps its name. A client still asking for the old name is NAKed and gets the PART/JOIN fallback; no known client (Seance included) requests it;
-  - the ISUPPORT token `evilnet/CHATHISTORYRETENTION` becomes `evilnet.github.io/CHATHISTORYRETENTION`, with the old name also advertised, same value, for a transition release.
+A session was live when a newer build crashed; an older build then ran, and the newer build came back. What happens to the session?
+- expire it at the roll-forward **(current)**;
+- keep holding it from the crash. This needs the older build to keep the newer one's last heartbeat, for example under a per-writer key `bouncer/alive/<writer>`.
 
-  ibutsu (2026-11-17): "isupport tokens don't really get any clarification, and I've only seen "draft/" ones, but maybe they're supposed to use the full name too". The IRCv3 specs only show `draft/` ISUPPORT tokens (`draft/ICON`, `draft/ACCOUNTREQUIRED`). soju uses its DNS name for its own capabilities and for most of its own ISUPPORT tokens (`soju.im/SAFERATE`, `soju.im/FILEHOST`; `BOUNCER_NETID` is unprefixed).
-- **Open:** should the old capability name also be offered for a transition release? This PR does not (two names for one capability need new plumbing).
+### Q3 · #245 bouncer: restore with a taken nick
+Status: 🟡 OPEN
+
+At restore, another account's restored session already holds this session's nick.
+- skip it; its record stays until its hold ends **(current)**;
+- restore it under a fallback nick.
+
+### Q4 · #246 / #247 rehash: the pre-check mechanism
+Status: 🟡 OPEN
+
+How should a configuration with errors be caught before a rehash applies it?
+- a child-process check (`ircd -k` in a fresh process) **(current)**;
+- parse into staged structures, swapped in only on success;
+- an in-process syntax-only pass (catches syntax errors and missing includes, not semantic ones).
+
+### Q5 · #246 GitSync when the check fails to run
+Status: 🟡 OPEN
+
+If the child process stays (#246 only), what does GitSync do when the check itself crashes or cannot run?
+- refuse the commit after one crash **(current)**;
+- treat the result as unknown and proceed;
+- refuse only after a second failure.
+
+### Q9 · #253 ordering with Seance
+Status: 🟡 OPEN
+
+Should evilnet/seance#327 merge and deploy before `PERSISTENCE_DRAFT_EXTRAS` is turned off?
+
+While the flag is on, Seance develop sees no change: it gets the old batch type for connections without the vendor cap, and the value is still on `draft/persistence`.
+
+Second opinion (review): #253 can merge first. Turn the flag FALSE only once #327 is in every shipped Seance build (web, phone, desktop); otherwise develop loses restore recognition and `attach-cursor`. #327 is 8 commits behind develop and needs a rebase before it merges.
+
+### Q11 · #261 res, ssl, nick: one PR or three?
+Status: 🟡 OPEN
+
+#261 carries three independent inherited-bug fixes. Should it be split into three PRs, one per bug, following the one-subject-per-PR practice?
+
+### Q12 · #261 an empty `sslfp`
+Status: 🟡 OPEN
+
+What should `sslfp = "";` in a block mean?
+- refuse every client **(current)**;
+- treat an empty `sslfp` as no requirement.
+
+### Q14 · #289 old capability name during a transition
+Status: 🟡 OPEN
+
+Should the old capability name `evilnet/channel-relocate` also be offered for one transition release?
+
+#289 does not offer it: a client still asking for it is NAKed and gets the PART/JOIN fallback. Two names for one capability would need new plumbing, and no known client (Seance included) requests it. The old ISUPPORT name is kept for a release.
+
+### Q15 · #280 a services rename of a bouncer session's account
+Status: 🟡 OPEN
+
+X3's `RENAME` sends `AC M`, which changes every connection's account while the session stays filed under the old name. After a split and heal, both halves are killed (issue evilnet/nefarious2#280). What should the fix be?
+- each server re-files the session under the new name on an `M` from a services server, merging by session id (proposed in #280);
+- services are kept from renaming an account with a live bouncer session;
+- something else.
+
+### Q16 · testnet: which X3 config is live
+Status: 🟡 OPEN
+
+In the testnet-svc compose setup, X3 reads `/x3/data/x3.conf` from the `x3_data` volume (seeded from `x3/docker/x3.conf-dist`), not `testnet-svc/data/x3.conf`. Is `data/x3.conf` meant to be used, or is it stale?
+
+---
+
+# ✅ RESOLVED
+
+### Q1 · #242 timestamps with an explicit zero offset
+Status: ✅ RESOLVED (2026-11-17, done in 1ec4bc92)
+
+**Decision:** follow the spec exactly. A client timestamp is accepted only as `YYYY-MM-DDThh:mm:ss.sssZ`, in CHATHISTORY, SEARCH and MARKREAD:
+- three fractional digits;
+- uppercase `T` and `Z`;
+- fields in range, with seconds up to 60 for a leap second.
+
+`+00:00`, a missing `Z` or fraction, and a fraction of another length are refused with `FAIL ... INVALID_PARAMS`.
+
+**Why:** `extensions/chathistory.md:67`: "A `timestamp` parameter MUST have the format `timestamp=YYYY-MM-DDThh:mm:ss.sssZ`". `read-marker.md:52` says the same. ibutsu: "technically a spec violation, so it's really a matter of how strict we want to be".
+
+### Q6 · #252 which channels a SEARCH without `in=` federates
+Status: ✅ RESOLVED (2026-11-17)
+
+**Decision:** #252 keeps its scope (up to 8 of the requester's channels). The cost, about 2 s of a storage peer's main loop for 8 channels of 50 000 rows, is fixed by moving the SEARCH store walk to the thread pool in a separate follow-up PR built on #252 (in progress).
+
+**Why:** ibutsu: "rocksdb reads are thread safe and we can use the threadpool for them".
+
+### Q7 · #253 extras as subcommands
+Status: ✅ RESOLVED (2026-11-17, no code change)
+
+**Decision:** ATTACH, DETACH, LIST, PROFILE and REPLAY stay `PERSISTENCE` subcommands.
+
+**Why:** the draft says "Implementations SHOULD ignore unrecognized subcommands, to be compatible with future extensions of this specification" (ibutsu).
+
+### Q8 · #253 cap-less use of the extras
+Status: ✅ RESOLVED (2026-11-17, done in c70cd604)
+
+**Decision:** the extras work on every connection, whatever the caps and the `PERSISTENCE_DRAFT_EXTRAS` flag. `evilnet.github.io/persistence` announces them; the flag controls only the old names.
+
+**Why:**
+- ibutsu: a gate "blocks bouncer users without the CAP from adjusting the auto-replay". REPLAY is the only way to set auto-replay.
+- The gate protected nothing: each extra requires the account and acts only on that account's own sessions and settings.
+
+### Q10 · #253 the capability's name
+Status: ✅ RESOLVED (2026-11-17)
+
+**Decision:** `evilnet.github.io/persistence`.
+
+**Why:** vendor-specific capability names "are prefixed by a valid DNS domain name" (`extensions/capability-negotiation.md:510`, cited by ibutsu), which `evilnet/<name>` is not.
+
+### Q13 · #253 cap-gating unsolicited output
+Status: ✅ RESOLVED (2026-11-17, done in 1b414b16)
+
+**Decision:**
+- The restore batch is wrapped only for a connection with `evilnet.github.io/persistence` (vendor type) or, while `PERSISTENCE_DRAFT_EXTRAS` is on, for any `batch` client (old type, as before). Otherwise its lines go out unwrapped.
+- The non-spec `PERSISTENCE SET <state>` line before a SET's STATUS goes only to a vendor-cap connection or while the flag is on.
+
+**Why:** ibutsu: "anything that has the server send unsolicited messages the client may not understand must be CAP gated … there's some gray area there since clients are supposed to ignore batch types they don't understand."
+
+### Q17 · old vendor names to the DNS form
+Status: ✅ RESOLVED (2026-11-17, draft evilnet/nefarious2#289)
+
+**Decision:** both move to the DNS form.
+- The capability `evilnet/channel-relocate` becomes `evilnet.github.io/channel-relocate`. The feature `CAP_evilnet_channel_relocate` keeps its name. Whether to keep offering the old name is Q14.
+- The ISUPPORT token `evilnet/CHATHISTORYRETENTION` becomes `evilnet.github.io/CHATHISTORYRETENTION`. The old name is also advertised, with the same value, for a transition release.
+
+**Why:**
+- `capability-negotiation.md:510` covers the capability.
+- ISUPPORT has no rule of its own. ibutsu: "maybe they're supposed to use the full name too". soju uses its DNS name for its own capabilities and most of its own ISUPPORT tokens (`soju.im/SAFERATE`, `soju.im/FILEHOST`).
+
+---
 
 ## Merge order notes (no decision needed)
 - Whichever of #232 and #252 lands second needs `requester_type_mask()`.
 - Whichever of #268 and #278 lands second drops #268's special case.
 - #241 lands with or before #276.
-
-## Other open questions
-- **#280, a services rename of a bouncer session's account.** X3's `RENAME` sends `AC M`, which changes every connection's account while the session stays filed under the old name; after a split and heal both halves are killed. The issue proposes that each server re-files the session under the new name on an `M` from a services server, merging by session id. Is that the shape you want? Or should services be kept from renaming an account with a live bouncer session? Or something else?
-- **testnet: which X3 config is live.** In the testnet-svc compose setup, X3 reads `/x3/data/x3.conf` from the `x3_data` volume (seeded from `x3/docker/x3.conf-dist`), not `testnet-svc/data/x3.conf`. Is `data/x3.conf` meant to be used, or is it stale?
