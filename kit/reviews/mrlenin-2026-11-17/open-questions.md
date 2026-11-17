@@ -51,7 +51,7 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
 12. Should `sslfp = ""` in a block mean "no fingerprint required"?
 
 ## Vendor name prefixes on ircv3.2-upgrade
-- **Decided (2026-11-17): both move to the DNS form**, on branch `fix/vendor-cap-name` (new draft PR):
+- **Decided (2026-11-17): both move to the DNS form**, in draft PR evilnet/nefarious2#289 (branch `fix/vendor-cap-name`):
   - the capability `evilnet/channel-relocate` becomes `evilnet.github.io/channel-relocate` (`capability-negotiation.md:510`). The feature `CAP_evilnet_channel_relocate` keeps its name. A client still asking for the old name is NAKed and gets the PART/JOIN fallback; no known client (Seance included) requests it;
   - the ISUPPORT token `evilnet/CHATHISTORYRETENTION` becomes `evilnet.github.io/CHATHISTORYRETENTION`, with the old name also advertised, same value, for a transition release.
 
