@@ -1,4 +1,4 @@
-# nefarious2 draft PRs: open questions (updated 2026-11-17 20:10 UTC)
+# nefarious2 draft PRs: open questions (updated 2026-11-17 20:16 UTC)
 
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
@@ -15,7 +15,6 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q3 | #245 | Restored session whose nick another account holds: skip or fallback nick? | 🟡 OPEN |
 | Q4 | #246/#247 | Rehash pre-check mechanism | 🟡 OPEN |
 | Q5 | #246 | GitSync when the check itself crashes | 🟡 OPEN |
-| Q9 | #253 | Must Seance #327 ship before `PERSISTENCE_DRAFT_EXTRAS` goes FALSE? | 🟡 OPEN |
 | Q11 | #261 | Split into three PRs? | 🟡 OPEN |
 | Q12 | #261 | Does `sslfp = ""` mean "no fingerprint required"? | 🟡 OPEN |
 | Q14 | #289 | Offer the old `evilnet/channel-relocate` name for a transition release? | 🟡 OPEN |
@@ -25,6 +24,7 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q6 | #252 | Which channels a no-`in=` SEARCH federates; scan cost | ✅ RESOLVED: keep scope, scan to the thread pool |
 | Q7 | #253 | Extras as `PERSISTENCE` subcommands or their own command? | ✅ RESOLVED: subcommands |
 | Q8 | #253 | Does cap-less use of the extras end? | ✅ RESOLVED: never |
+| Q9 | #253 | Must Seance #327 ship before `PERSISTENCE_DRAFT_EXTRAS` goes FALSE? | ✅ RESOLVED: nef2 goes ahead; Seance tracked in evilnet/seance#333 |
 | Q10 | #253 | Capability name form | ✅ RESOLVED: `evilnet.github.io/persistence` |
 | Q13 | #253 | Cap-gating unsolicited output (restore batch, SET line) | ✅ RESOLVED: gated |
 | Q17 | #289 | Move old vendor names to the DNS form? | ✅ RESOLVED: yes, draft #289 |
@@ -62,15 +62,6 @@ If the child process stays (#246 only), what does GitSync do when the check itse
 - refuse the commit after one crash **(current)**;
 - treat the result as unknown and proceed;
 - refuse only after a second failure.
-
-### Q9 · #253 ordering with Seance
-Status: 🟡 OPEN
-
-Should evilnet/seance#327 merge and deploy before `PERSISTENCE_DRAFT_EXTRAS` is turned off?
-
-While the flag is on, Seance develop sees no change: it gets the old batch type for connections without the vendor cap, and the value is still on `draft/persistence`.
-
-Second opinion (review): #253 can merge first. Turn the flag FALSE only once #327 is in every shipped Seance build (web, phone, desktop); otherwise develop loses restore recognition and `attach-cursor`. #327 is 8 commits behind develop and needs a rebase before it merges.
 
 ### Q11 · #261 res, ssl, nick: one PR or three?
 Status: 🟡 OPEN
@@ -142,6 +133,13 @@ Status: ✅ RESOLVED (2026-11-17, done in c70cd604)
 **Why:**
 - ibutsu: a gate "blocks bouncer users without the CAP from adjusting the auto-replay". REPLAY is the only way to set auto-replay.
 - The gate protected nothing: each extra requires the account and acts only on that account's own sessions and settings.
+
+### Q9 · #253 ordering with Seance
+Status: ✅ RESOLVED (2026-11-17, tracked in evilnet/seance#333)
+
+**Decision:** nefarious2 makes its transitions without waiting for Seance. #253 can merge first. Seance's side (evilnet/seance#327: request the vendor cap, read `attach-cursor` from either value, accept either batch type) is tracked in evilnet/seance#333 with the other nefarious2 transitions, and is worked separately.
+
+**Why:** while `PERSISTENCE_DRAFT_EXTRAS` is on (the default), Seance develop sees no change. Turning it FALSE is a deployment step, to be taken once #333's persistence items are in every shipped Seance build (web, phone, desktop).
 
 ### Q10 · #253 the capability's name
 Status: ✅ RESOLVED (2026-11-17)
