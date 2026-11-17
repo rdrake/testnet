@@ -1,4 +1,4 @@
-# nefarious2 draft PRs: open questions (updated 2026-11-17 20:17 UTC)
+# nefarious2 draft PRs: open questions (updated 2026-11-17 20:22 UTC)
 
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
@@ -16,7 +16,6 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q4 | #246/#247 | Rehash pre-check mechanism | 🟡 OPEN |
 | Q5 | #246 | GitSync when the check itself crashes | 🟡 OPEN |
 | Q12 | #261 | Does `sslfp = ""` mean "no fingerprint required"? | 🟡 OPEN |
-| Q14 | #289 | Offer the old `evilnet/channel-relocate` name for a transition release? | 🟡 OPEN |
 | Q15 | #280 | Fix shape for a services rename of a bouncer session's account | 🟡 OPEN |
 | Q16 | testnet | Is `testnet-svc/data/x3.conf` meant to be used, or stale? | 🟡 OPEN |
 | Q1 | #242 | Accept `+00:00` timestamps? | ✅ RESOLVED: no, spec form only |
@@ -27,6 +26,7 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q10 | #253 | Capability name form | ✅ RESOLVED: `evilnet.github.io/persistence` |
 | Q11 | #261 | Split into three PRs? | ✅ RESOLVED: yes, one PR per bug (and #262 likewise) |
 | Q13 | #253 | Cap-gating unsolicited output (restore batch, SET line) | ✅ RESOLVED: gated |
+| Q14 | #289 | Offer the old `evilnet/channel-relocate` name for a transition release? | ✅ RESOLVED: no, new name only |
 | Q17 | #289 | Move old vendor names to the DNS form? | ✅ RESOLVED: yes, draft #289 |
 
 ---
@@ -69,13 +69,6 @@ Status: 🟡 OPEN
 What should `sslfp = "";` in a block mean?
 - refuse every client **(current)**;
 - treat an empty `sslfp` as no requirement.
-
-### Q14 · #289 old capability name during a transition
-Status: 🟡 OPEN
-
-Should the old capability name `evilnet/channel-relocate` also be offered for one transition release?
-
-#289 does not offer it: a client still asking for it is NAKed and gets the PART/JOIN fallback. Two names for one capability would need new plumbing, and no known client (Seance included) requests it. The old ISUPPORT name is kept for a release.
 
 ### Q15 · #280 a services rename of a bouncer session's account
 Status: 🟡 OPEN
@@ -134,7 +127,7 @@ Status: ✅ RESOLVED (2026-11-17, tracked in evilnet/seance#333)
 
 **Decision:** nefarious2 makes its transitions without waiting for Seance. #253 can merge first. Seance's side (evilnet/seance#327: request the vendor cap, read `attach-cursor` from either value, accept either batch type) is tracked in evilnet/seance#333 with the other nefarious2 transitions, and is worked separately.
 
-**Why:** while `PERSISTENCE_DRAFT_EXTRAS` is on (the default), Seance develop sees no change. Turning it FALSE is a deployment step, to be taken once #333's persistence items are in every shipped Seance build (web, phone, desktop).
+**What it means:** #253 makes `PERSISTENCE_DRAFT_EXTRAS` FALSE by default (be612447), so the server behaves as the final state. Seance develop sees no change only on a network that turns the flag on; a network serving Seance builds without #333's persistence items (web, phone, desktop) keeps it on until they ship.
 
 ### Q10 · #253 the capability's name
 Status: ✅ RESOLVED (2026-11-17)
@@ -158,6 +151,11 @@ Status: ✅ RESOLVED (2026-11-17, done in 1b414b16)
 - The non-spec `PERSISTENCE SET <state>` line before a SET's STATUS goes only to a vendor-cap connection or while the flag is on.
 
 **Why:** ibutsu: "anything that has the server send unsolicited messages the client may not understand must be CAP gated … there's some gray area there since clients are supposed to ignore batch types they don't understand."
+
+### Q14 · #289 old capability name during a transition
+Status: ✅ RESOLVED (2026-11-17, #289 as it stands)
+
+**Decision:** no transition name. Only `evilnet.github.io/channel-relocate` is offered; a client still asking for `evilnet/channel-relocate` is NAKed and gets the PART/JOIN fallback. Richard: nobody uses the old name outside testing. The old ISUPPORT name is still kept for a release.
 
 ### Q17 · old vendor names to the DNS form
 Status: ✅ RESOLVED (2026-11-17, draft evilnet/nefarious2#289)
