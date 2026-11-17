@@ -3,9 +3,7 @@
 Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-17 review round. Each PR already does the option marked **(current)**, so nothing is blocked; changing a choice is a follow-up commit.
 
 ## #242 chathistory: SEARCH and timestamp parsing
-1. Should a timestamp with an explicit zero offset (`+00:00`, what Python's `datetime.isoformat()` gives for an aware UTC time) be accepted?
-   - Accept it: such clients keep working.
-   - Refuse it, `Z` being the only UTC spelling: `FAIL ... INVALID_PARAMS` **(current)**.
+1. **Decided: refuse.** A timestamp with an explicit zero offset (`2026-11-17T12:00:00.000+00:00`) is a spec violation: chathistory takes `timestamp=` in the server-time format, `YYYY-MM-DDThh:mm:ss.sssZ`, UTC with `Z`. #242 answers it with `FAIL ... INVALID_PARAMS`, as it does now.
 
 ## #245 bouncer: rollback keeps a newer build's session records
 2. A session live when a newer build crashed, after which an older build ran and the newer build came back:
