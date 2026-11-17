@@ -6,7 +6,7 @@ A user's N line carries no away state, and the burst sent no AWAY after it. A se
 - The pre-away star goes as a star to an IRCv3-aware link and as the configured text to a legacy one, as `away_send_to_servers()` does for a fork user's star.
 - `m_burst`'s netjoin away-notify now sends a stored star the way `away_notify_channel()` does: as a star to draft/pre-away clients and as the configured text to the rest. Until now no burst user was ever away at that point, so the raw `*` it would have sent was never reached.
 
-- The netjoin AWAY gets a msgid of its own. It used to go out while the JOIN's msgid was still set, so a message-tags client got two events with one msgid.
+- The netjoin AWAY gets a msgid of its own, and an @time from the event clock the JOIN's comes from. It used to go out while the JOIN's msgid was still set, so a message-tags client got two events with one msgid.
 
 **Not covered, as before:**
 - A session held on another server and learned through this burst is not restated to this link by anyone; only its holder restates, and only to its own direct links. Bursting it from here would mean a non-holder sending AWAY for a session user (invariant #22), which needs the bouncer design's say.

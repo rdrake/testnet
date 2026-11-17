@@ -9,5 +9,3 @@ run() { if [ "$POST" = 1 ]; then gh pr create -R $R $DRAFT "$@"; else echo gh pr
 [ "$1" = --post ] && POST=1
 run --base ircv3.2-upgrade --head rdrake:fix/n014-rename-history \
   --title "chathistory: a renamed channel's history follows it to the new name" --body-file n014.md
-run --base ircv3.2-upgrade --head rdrake:fix/n069-log-ring-full \
-  --title "log: a wakeup on a full async log ring is not room" --body-file n069.md
