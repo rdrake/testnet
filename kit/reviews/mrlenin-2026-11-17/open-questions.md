@@ -29,6 +29,7 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
    - only channels whose window this server did not fully receive (`channel_range_check()`, as pages already use);
    - all of them, sharing one scan budget across the parts (e.g. a `max=<n>` selector that older responders ignore);
    - a lower `SEARCH_FED_PARTS_MAX`, or fake lag charged per part.
+   - **Dev input (ibutsu, 2026-11-17):** "rocksdb reads are thread safe and we can use the threadpool for them". So the scan could move off the main loop: a `thread_pool_submit()` worker walks the store, and the callback filters and replies on the main thread. That removes the ~2 s stall whichever channels federate.
 
 ## #253 persistence: the extras move to `evilnet.github.io/persistence`
 7. Do the extras (ATTACH, DETACH, LIST, PROFILE, REPLAY) stay `PERSISTENCE` subcommands under the vendor capability **(current)**, or move to a vendor command of their own?
