@@ -1,4 +1,4 @@
-# nefarious2 draft PRs: open questions (updated 2026-11-17 20:19 UTC)
+# nefarious2 draft PRs: open questions (updated 2026-11-17 20:22 UTC)
 
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
@@ -15,7 +15,7 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q3 | #245 | Restored session whose nick another account holds: skip or fallback nick? | 🟡 OPEN |
 | Q4 | #246/#247 | Rehash pre-check mechanism | 🟡 OPEN |
 | Q5 | #246 | GitSync when the check itself crashes | 🟡 OPEN |
-| Q12 | #261 | Does `sslfp = ""` mean "no fingerprint required"? | 🟡 OPEN |
+| Q12 | #291/#294 | Does `sslfp = ""` mean "no fingerprint required"? | 🟡 OPEN |
 | Q15 | #280 | Fix shape for a services rename of a bouncer session's account | 🟡 OPEN |
 | Q16 | testnet | Is `testnet-svc/data/x3.conf` meant to be used, or stale? | 🟡 OPEN |
 | Q1 | #242 | Accept `+00:00` timestamps? | ✅ RESOLVED: no, spec form only |
@@ -63,7 +63,7 @@ If the child process stays (#246 only), what does GitSync do when the check itse
 - treat the result as unknown and proceed;
 - refuse only after a second failure.
 
-### Q12 · #261 an empty `sslfp`
+### Q12 · #291 / #294 an empty `sslfp`
 Status: 🟡 OPEN
 
 What should `sslfp = "";` in a block mean?
@@ -137,9 +137,9 @@ Status: ✅ RESOLVED (2026-11-17)
 **Why:** vendor-specific capability names "are prefixed by a valid DNS domain name" (`extensions/capability-negotiation.md:510`, cited by ibutsu), which `evilnet/<name>` is not.
 
 ### Q11 · #261 res, ssl, nick: one PR or three?
-Status: ✅ RESOLVED (2026-11-17, split in progress)
+Status: ✅ RESOLVED (2026-11-17, done: #290–#295; #261 and #262 closed)
 
-**Decision:** split into three PRs, one per bug (res `irc_in_addr_valid()`, ssl `verify_sslclifp()`, nick `ms_nick()` collision), and the master twin #262 the same way. The `-Waddress` pragma cleanup goes with the ssl PR, and so does Q12.
+**Decision:** split into three PRs, one per bug (res `irc_in_addr_valid()`, ssl `verify_sslclifp()`, nick `ms_nick()` collision), and the master twin #262 the same way: #290 (res), #291 (ssl), #292 (nick) on `ircv3.2-upgrade`, #293–#295 on master. The `-Waddress` pragma cleanup goes with the ssl PR, and so does Q12.
 
 **Why:** the repository's practice is one subject per PR.
 
