@@ -5,7 +5,7 @@
 - One that an earlier configuration made is only marked inactive. `close_listeners()` then closes it, or the last `release_listener()` does if clients still hold it.
 
 **Testing:**
-- New CMocka suite `listener_rehash_cmocka` includes `listener.c`, with the sockets stubbed and `free()` wrapped. Its two rehash cases fail before the change and pass after. (On ircv3.2-upgrade; master has no CMocka harness.)
+- New CMocka suite `listener_rehash_cmocka` includes `listener.c`, with the sockets stubbed and `free()` wrapped. Its two rehash cases fail before the change and pass after. It stubs `conf_is_check_only()`, so it also links with #238 applied. (On ircv3.2-upgrade; master has no CMocka harness.)
 - Under valgrind, on a host without IPv6: a Port moved from `vhost = ipv4 "*"` to `vhost = ipv6 "*"`, with a client connected on it.
   - The old build gives 39 invalid reads and writes, in `close_listeners()` and in `release_listener()` when the client leaves.
   - The new build gives none, closes the port, and reopens it on the next REHASH.
