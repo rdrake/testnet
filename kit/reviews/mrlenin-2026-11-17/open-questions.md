@@ -1,4 +1,4 @@
-# nefarious2 draft PRs: open questions (updated 2026-11-17 20:22 UTC)
+# nefarious2 draft PRs: open questions (updated 2026-11-17 20:19 UTC)
 
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
@@ -26,7 +26,7 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q10 | #253 | Capability name form | ✅ RESOLVED: `evilnet.github.io/persistence` |
 | Q11 | #261 | Split into three PRs? | ✅ RESOLVED: yes, one PR per bug (and #262 likewise) |
 | Q13 | #253 | Cap-gating unsolicited output (restore batch, SET line) | ✅ RESOLVED: gated |
-| Q14 | #289 | Offer the old `evilnet/channel-relocate` name for a transition release? | ✅ RESOLVED: no, new name only |
+| Q14 | #289 | Offer the old `evilnet/channel-relocate` name for a transition release? | ✅ RESOLVED: no, as #289 does |
 | Q17 | #289 | Move old vendor names to the DNS form? | ✅ RESOLVED: yes, draft #289 |
 
 ---
@@ -153,15 +153,17 @@ Status: ✅ RESOLVED (2026-11-17, done in 1b414b16)
 **Why:** ibutsu: "anything that has the server send unsolicited messages the client may not understand must be CAP gated … there's some gray area there since clients are supposed to ignore batch types they don't understand."
 
 ### Q14 · #289 old capability name during a transition
-Status: ✅ RESOLVED (2026-11-17, #289 as it stands)
+Status: ✅ RESOLVED (2026-11-17, no code change)
 
-**Decision:** no transition name. Only `evilnet.github.io/channel-relocate` is offered; a client still asking for `evilnet/channel-relocate` is NAKed and gets the PART/JOIN fallback. Richard: nobody uses the old name outside testing. The old ISUPPORT name is still kept for a release.
+**Decision:** don't offer the old name. #289 stays as it is: a client asking for `evilnet/channel-relocate` is NAKed and gets the PART/JOIN fallback.
+
+**Why:** nothing outside testing uses the old name, so there is no one to transition.
 
 ### Q17 · old vendor names to the DNS form
 Status: ✅ RESOLVED (2026-11-17, draft evilnet/nefarious2#289)
 
 **Decision:** both move to the DNS form.
-- The capability `evilnet/channel-relocate` becomes `evilnet.github.io/channel-relocate`. The feature `CAP_evilnet_channel_relocate` keeps its name. Whether to keep offering the old name is Q14.
+- The capability `evilnet/channel-relocate` becomes `evilnet.github.io/channel-relocate`. The feature `CAP_evilnet_channel_relocate` keeps its name. The old name is not offered (Q14).
 - The ISUPPORT token `evilnet/CHATHISTORYRETENTION` becomes `evilnet.github.io/CHATHISTORYRETENTION`. The old name is also advertised, with the same value, for a transition release.
 
 **Why:**
