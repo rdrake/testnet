@@ -4,6 +4,7 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
 
 ## #242 chathistory: SEARCH and timestamp parsing
 1. **Decided (2026-11-17):** a timestamp with an explicit zero offset (`+00:00`) stays refused with `FAIL ... INVALID_PARAMS`. `extensions/chathistory.md:67` says a `timestamp` parameter MUST have the format `timestamp=YYYY-MM-DDThh:mm:ss.sssZ`; ibutsu agrees it is a spec violation and a matter of strictness. The #242 description says so.
+   - **Done (2026-11-17, 1ec4bc92):** following the spec all the way: a client timestamp is taken only as exactly `YYYY-MM-DDThh:mm:ss.sssZ` (three fractional digits, uppercase `T`/`Z`, fields in range, seconds to 60 for a leap second) in CHATHISTORY, SEARCH and MARKREAD. A missing `Z` or fraction, or a fraction of another length, is now refused too.
 
 ## #245 bouncer: rollback keeps a newer build's session records
 2. A session live when a newer build crashed, after which an older build ran and the newer build came back:
@@ -30,6 +31,7 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
    - all of them, sharing one scan budget across the parts (e.g. a `max=<n>` selector that older responders ignore);
    - a lower `SEARCH_FED_PARTS_MAX`, or fake lag charged per part.
    - **Dev input (ibutsu, 2026-11-17):** "rocksdb reads are thread safe and we can use the threadpool for them". So the scan could move off the main loop: a `thread_pool_submit()` worker walks the store, and the callback filters and replies on the main thread. That removes the ~2 s stall whichever channels federate.
+   - **Decided (2026-11-17):** the thread-pool scan goes in a separate follow-up PR built on #252 (in progress); #252 keeps its current scope (up to 8 channels).
 
 ## #253 persistence: the extras move to `evilnet.github.io/persistence`
 7. Do the extras (ATTACH, DETACH, LIST, PROFILE, REPLAY) stay `PERSISTENCE` subcommands under the vendor capability **(current)**, or move to a vendor command of their own?
@@ -41,12 +43,13 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
 11. Split it into three PRs, one per bug?
 12. Should `sslfp = ""` in a block mean "no fingerprint required"?
 
-## Vendor name prefixes on ircv3.2-upgrade (not in a PR yet)
-- **Should the older vendor names move to the DNS form as well?** Two candidates:
-  - the capability `evilnet/channel-relocate` (`ircd/m_cap.c:372`), which `capability-negotiation.md:510` says should be DNS-prefixed;
-  - the ISUPPORT token `evilnet/CHATHISTORYRETENTION` (`ircd/m_chathistory.c:4588`).
+## Vendor name prefixes on ircv3.2-upgrade
+- **Decided (2026-11-17): both move to the DNS form**, on branch `fix/vendor-cap-name` (new draft PR):
+  - the capability `evilnet/channel-relocate` becomes `evilnet.github.io/channel-relocate` (`capability-negotiation.md:510`). The feature `CAP_evilnet_channel_relocate` keeps its name. A client still asking for the old name is NAKed and gets the PART/JOIN fallback; no known client (Seance included) requests it;
+  - the ISUPPORT token `evilnet/CHATHISTORYRETENTION` becomes `evilnet.github.io/CHATHISTORYRETENTION`, with the old name also advertised, same value, for a transition release.
 
-  ibutsu (2026-11-17): "isupport tokens don't really get any clarification, and I've only seen "draft/" ones, but maybe they're supposed to use the full name too". The IRCv3 specs only show `draft/` ISUPPORT tokens (`draft/ICON`, `draft/ACCOUNTREQUIRED`). In practice soju uses its DNS name for its own ISUPPORT tokens as well as its capabilities: `soju.im/SAFERATE` and `soju.im/FILEHOST` (soju de8690c, `downstream.go:294`, `:1342`; `doc/ext/filehost.md:26`), next to caps such as `soju.im/bouncer-networks` and `soju.im/read`. Either rename would be client-visible and needs a transition (both names for a while), like #253.
+  ibutsu (2026-11-17): "isupport tokens don't really get any clarification, and I've only seen "draft/" ones, but maybe they're supposed to use the full name too". The IRCv3 specs only show `draft/` ISUPPORT tokens (`draft/ICON`, `draft/ACCOUNTREQUIRED`). soju uses its DNS name for its own capabilities and for most of its own ISUPPORT tokens (`soju.im/SAFERATE`, `soju.im/FILEHOST`; `BOUNCER_NETID` is unprefixed).
+- **Open:** should the old capability name also be offered for a transition release? This PR does not (two names for one capability need new plumbing).
 
 ## Merge order notes (no decision needed)
 - Whichever of #232 and #252 lands second needs `requester_type_mask()`.
