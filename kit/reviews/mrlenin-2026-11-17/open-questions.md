@@ -3,7 +3,7 @@
 Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-17 review round. Each PR already does the option marked **(current)**, so nothing is blocked; changing a choice is a follow-up commit.
 
 ## #242 chathistory: SEARCH and timestamp parsing
-1. **Decided: refuse.** A timestamp with an explicit zero offset (`2026-11-17T12:00:00.000+00:00`) is a spec violation: chathistory takes `timestamp=` in the server-time format, `YYYY-MM-DDThh:mm:ss.sssZ`, UTC with `Z`. #242 answers it with `FAIL ... INVALID_PARAMS`, as it does now.
+1. **Decided (2026-11-17):** a timestamp with an explicit zero offset (`+00:00`) stays refused with `FAIL ... INVALID_PARAMS`. `extensions/chathistory.md:67` says a `timestamp` parameter MUST have the format `timestamp=YYYY-MM-DDThh:mm:ss.sssZ`; ibutsu agrees it is a spec violation and a matter of strictness. The #242 description says so.
 
 ## #245 bouncer: rollback keeps a newer build's session records
 2. A session live when a newer build crashed, after which an older build ran and the newer build came back:
