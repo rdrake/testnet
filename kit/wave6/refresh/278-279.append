@@ -1,0 +1,4 @@
+
+**Added after review:**
+- A refused default facility now keeps the running one. With `"LOG" = "LOCAL9"` (no such facility) in the file, a REHASH used to put the facility back to USER, because the refusal left LOG unmarked. It is now marked, the same way a refused integer or boolean value is (#268/#269). I checked it as an oper with GET LOG: LOCAL4, then a REHASH with LOCAL9, then a REHASH with LOCAL4 again. Before the fix this gave LOCAL4, USER, LOCAL4; after it, LOCAL4 throughout. An operator's refused `SET LOG` changes nothing, as before.
+- Behaviour change: a facility set at runtime with `SET LOG <facility>` now goes back to the file's value (or USER) at REHASH, like any other feature. Before, it survived a REHASH whenever the file had a subsystem LOG line, by the accident described above.
