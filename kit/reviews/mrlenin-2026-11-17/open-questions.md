@@ -31,7 +31,7 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
    - all of them, sharing one scan budget across the parts (e.g. a `max=<n>` selector that older responders ignore);
    - a lower `SEARCH_FED_PARTS_MAX`, or fake lag charged per part.
    - **Dev input (ibutsu, 2026-11-17):** "rocksdb reads are thread safe and we can use the threadpool for them". So the scan could move off the main loop: a `thread_pool_submit()` worker walks the store, and the callback filters and replies on the main thread. That removes the ~2 s stall whichever channels federate.
-   - **In progress (2026-11-17):** moving the SEARCH store walk (the local SEARCH and the `CH Q S` responder) to the thread pool, as its own follow-up PR off `ircv3.2-upgrade`, independent of #252.
+   - **In progress (2026-11-17):** moving the SEARCH store walk to the thread pool.
    - **Decided (2026-11-17):** the thread-pool scan goes in a separate follow-up PR built on #252 (in progress); #252 keeps its current scope (up to 8 channels).
 
 ## #253 persistence: the extras move to `evilnet.github.io/persistence`
