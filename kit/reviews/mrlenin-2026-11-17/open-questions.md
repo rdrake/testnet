@@ -41,6 +41,13 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
 11. Split it into three PRs, one per bug?
 12. Should `sslfp = ""` in a block mean "no fingerprint required"?
 
+## Vendor name prefixes on ircv3.2-upgrade (not in a PR yet)
+- **Should the older vendor names move to the DNS form as well?** Two candidates:
+  - the capability `evilnet/channel-relocate` (`ircd/m_cap.c:372`), which `capability-negotiation.md:510` says should be DNS-prefixed;
+  - the ISUPPORT token `evilnet/CHATHISTORYRETENTION` (`ircd/m_chathistory.c:4588`).
+
+  ibutsu (2026-11-17): "isupport tokens don't really get any clarification, and I've only seen "draft/" ones, but maybe they're supposed to use the full name too". The IRCv3 specs only show `draft/` ISUPPORT tokens (`draft/ICON`, `draft/ACCOUNTREQUIRED`). In practice soju already sends `soju.im/FILEHOST` next to `draft/FILEHOST`; the testnet's own 005 carries both. Either rename would be client-visible and needs a transition (both names for a while), like #253.
+
 ## Merge order notes (no decision needed)
 - Whichever of #232 and #252 lands second needs `requester_type_mask()`.
 - Whichever of #268 and #278 lands second drops #268's special case.
