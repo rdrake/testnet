@@ -1,0 +1,96 @@
+server: nef2-base-426b2808  version: ['@time=2026-11-17T12:01:24.078Z :irc.conformance.test 351 hapqbrq u2.10.12.14+Nefarious(2.0.0)+[426b2808]. irc.conformance.test :B27ADMRUZ6']
+caps: batch draft/chathistory echo-message labeled-response message-tags server-time
+queries: 1691 (615 follow-ups)
+events replayed in history (no event-playback) on: []
+ties #hapqbrempty: []
+ties #hapqbrhist: [['h04', 'h05', 'h06', 'h07'], ['h10', 'h09']]
+ties #hapqbrnojoin: []
+ties #hapqbrother: []
+ties #hapqbrtlc: [['t2', 't3']]
+ties dm: []
+order #hapqbrhist: server ['h01', 'h02', 'h03', 'h04', 'h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']
+order #hapqbrtlc: server ['t1', 't2', 't3', 't4']
+untagged last pages (SendsEnd is a SHOULD): 68
+TARGETS order: ['ascending']
+racing query #1687 (CHATHISTORY LATEST #hapqbrhist * 5): fits the snapshot after the racing line was stored (failed checks before/after: [2, 0])
+walk walk-msgid 3 (5 pages): 14 lines retrieved, missing [], duplicates 0
+walk walk-msgid 4 (4 pages): 14 lines retrieved, missing [], duplicates 0
+walk walk-ts 3 (5 pages): 12 lines retrieved, missing ['h04', 'h05'], duplicates 0
+walk walk-ts 4 (3 pages): 11 lines retrieved, missing ['h04', 'h05', 'h06'], duplicates 0
+
+property     pass   fail    n/a
+FRAME        1691      0      0
+MSGID        3274      0      0
+ELIG         1497      0     14
+EXACT        1627     18     14
+CONTIG       1495      0     14
+ORDER        1497      0     14
+END           961      4    573
+ENDLIVE       258      0      0
+UNKNOWN        24     12      2
+AROUND        150      0      0
+TARGETS         6      0      0
+NOAUTO          0      1      0
+ISUPPORT        2      0      0
+FAILREPLY       0     14      0
+
+[END] BEFORE msgid  x2  ()
+    e.g. #1659 CHATHISTORY BEFORE #hapqbrtlc msgid=ABAAAaHpYh8Kh4 5  [msgid from another channel]
+    expected: no end tag
+    observed: tagged
+[END] BETWEEN msgid,msgid  x2  ()
+    e.g. #1663 CHATHISTORY BETWEEN #hapqbrtlc msgid=ABAAAaHpYh75h0 msgid=ABAAAaHpYh8Kh4 5  [msgid from another channel]
+    expected: no end tag
+    observed: tagged
+[EXACT] AROUND msgid  x8  (latitude (CH:69 MAY return fewer))
+    e.g. #359 CHATHISTORY AROUND #hapqbrhist msgid=ABAABaHpYh60hv 14  [AROUND msgid=#9]
+    expected: min(limit, available) = 13 (CH:69 lower-case 'should')
+    observed: 12: ['h03', 'h04', 'h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']
+[EXACT] AROUND ts  x10  (latitude (CH:69 MAY return fewer))
+    e.g. #320 CHATHISTORY AROUND #hapqbrhist timestamp=2026-11-17T12:01:24.148Z 14  [AROUND ts=#8]
+    expected: min(limit, available) = 14 (CH:69 lower-case 'should')
+    observed: 13: ['h02', 'h03', 'h04', 'h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']
+[FAILREPLY] AFTER msgid  x2  (info: FAIL is a completion (CH-7))
+    e.g. #1636 CHATHISTORY AFTER #hapqbrhist msgid=zzzz-not-a-msgid-0000 5  [unknown msgid]
+    expected: a page
+    observed: @label=L1636;time=2026-11-17T12:01:24.671Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR AFTER #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id
+[FAILREPLY] AROUND msgid  x2  (info: FAIL is a completion (CH-7))
+    e.g. #1637 CHATHISTORY AROUND #hapqbrhist msgid=zzzz-not-a-msgid-0000 5  [unknown msgid]
+    expected: a page
+    observed: @label=L1637;time=2026-11-17T12:01:24.671Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR AROUND #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id
+[FAILREPLY] BEFORE msgid  x2  (info: FAIL is a completion (CH-7))
+    e.g. #1635 CHATHISTORY BEFORE #hapqbrhist msgid=zzzz-not-a-msgid-0000 5  [unknown msgid]
+    expected: a page
+    observed: @label=L1635;time=2026-11-17T12:01:24.671Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR BEFORE #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id
+[FAILREPLY] BEFORE ts  x1  (info: FAIL is a completion (CH-7))
+    e.g. #1673 CHATHISTORY BEFORE #hapqbrnojoin timestamp=2026-11-17T12:02:24.676Z 10  [target not joined]
+    expected: a page
+    observed: @label=L1673;time=2026-11-17T12:01:24.676Z :irc.conformance.test FAIL CHATHISTORY INVALID_TARGET BEFORE #hapqbrnojoin :No access to target
+[FAILREPLY] BETWEEN msgid,msgid  x4  (info: FAIL is a completion (CH-7))
+    e.g. #1638 CHATHISTORY BETWEEN #hapqbrhist msgid=zzzz-not-a-msgid-0000 msgid=ABAAAaHpYh70hz 5  [unknown msgid]
+    expected: a page
+    observed: @label=L1638;time=2026-11-17T12:01:24.672Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR BETWEEN #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id
+[FAILREPLY] LATEST *  x1  (info: FAIL is a completion (CH-7))
+    e.g. #1672 CHATHISTORY LATEST #hapqbrnojoin * 10  [target not joined]
+    expected: a page
+    observed: @label=L1672;time=2026-11-17T12:01:24.676Z :irc.conformance.test FAIL CHATHISTORY INVALID_TARGET LATEST #hapqbrnojoin :No access to target
+[FAILREPLY] LATEST msgid  x2  (info: FAIL is a completion (CH-7))
+    e.g. #1634 CHATHISTORY LATEST #hapqbrhist msgid=zzzz-not-a-msgid-0000 5  [unknown msgid]
+    expected: a page
+    observed: @label=L1634;time=2026-11-17T12:01:24.671Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR LATEST #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id
+[NOAUTO] -  x1  ()
+    e.g. #None   []
+    expected: no playback on JOIN (CH:41)
+    observed: [':irc.conformance.test NOTICE hapqbrl :on 5 ca 5(100) ft 10(10)']
+[UNKNOWN] AROUND msgid  x4  (violation of the D5 restriction)
+    e.g. #1643 CHATHISTORY AROUND #hapqbrhist msgid=ABAAAaHpYh8Kh4 5  [msgid from another channel]
+    expected: empty batch or FAIL (D5, MI-5)
+    observed: 2 lines: ['h13', 'h14']
+[UNKNOWN] BEFORE msgid  x4  (violation of the D5 restriction)
+    e.g. #1641 CHATHISTORY BEFORE #hapqbrhist msgid=ABAAAaHpYh8Kh4 5  [msgid from another channel]
+    expected: empty batch or FAIL (D5, MI-5)
+    observed: 5 lines: ['h09', 'h11', 'h12', 'h13', 'h14']
+[UNKNOWN] BETWEEN msgid,msgid  x4  (violation of the D5 restriction)
+    e.g. #1645 CHATHISTORY BETWEEN #hapqbrhist msgid=ABAAAaHpYh5uhm msgid=ABAAAaHpYh8Kh4 5  [msgid from another channel]
+    expected: empty batch or FAIL (D5, MI-5)
+    observed: 5 lines: ['h02', 'h03', 'h04', 'h05', 'h06']

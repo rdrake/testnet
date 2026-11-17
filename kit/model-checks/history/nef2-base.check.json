@@ -1,0 +1,604 @@
+{
+ "meta": {
+  "server_label": "nef2-base-426b2808",
+  "version": [
+   "@time=2026-11-17T12:01:24.078Z :irc.conformance.test 351 hapqbrq u2.10.12.14+Nefarious(2.0.0)+[426b2808]. irc.conformance.test :B27ADMRUZ6"
+  ],
+  "caps": [
+   "batch",
+   "draft/chathistory",
+   "echo-message",
+   "labeled-response",
+   "message-tags",
+   "server-time"
+  ],
+  "runid": "hapqbr"
+ },
+ "queries": 1691,
+ "props": {
+  "FRAME": {
+   "pass": 1691,
+   "fail": 0,
+   "na": 0
+  },
+  "MSGID": {
+   "pass": 3274,
+   "fail": 0,
+   "na": 0
+  },
+  "ELIG": {
+   "pass": 1497,
+   "fail": 0,
+   "na": 14
+  },
+  "EXACT": {
+   "pass": 1627,
+   "fail": 18,
+   "na": 14
+  },
+  "CONTIG": {
+   "pass": 1495,
+   "fail": 0,
+   "na": 14
+  },
+  "ORDER": {
+   "pass": 1497,
+   "fail": 0,
+   "na": 14
+  },
+  "END": {
+   "pass": 961,
+   "fail": 4,
+   "na": 573
+  },
+  "AROUND": {
+   "pass": 150,
+   "fail": 0,
+   "na": 0
+  },
+  "UNKNOWN": {
+   "pass": 24,
+   "fail": 12,
+   "na": 2
+  },
+  "FAILREPLY": {
+   "pass": 0,
+   "fail": 14,
+   "na": 0
+  },
+  "TARGETS": {
+   "pass": 6,
+   "fail": 0,
+   "na": 0
+  },
+  "ENDLIVE": {
+   "pass": 258,
+   "fail": 0,
+   "na": 0
+  },
+  "ISUPPORT": {
+   "pass": 2,
+   "fail": 0,
+   "na": 0
+  },
+  "NOAUTO": {
+   "pass": 0,
+   "fail": 1,
+   "na": 0
+  }
+ },
+ "deviations": [
+  {
+   "prop": "EXACT",
+   "i": 320,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist timestamp=2026-11-17T12:01:24.148Z 14",
+   "note": "AROUND ts=#8",
+   "expected": "min(limit, available) = 14 (CH:69 lower-case 'should')",
+   "observed": "13: ['h02', 'h03', 'h04', 'h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 359,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=ABAABaHpYh60hv 14",
+   "note": "AROUND msgid=#9",
+   "expected": "min(limit, available) = 13 (CH:69 lower-case 'should')",
+   "observed": "12: ['h03', 'h04', 'h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 360,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist timestamp=2026-11-17T12:01:24.148Z 14",
+   "note": "AROUND ts=#9",
+   "expected": "min(limit, available) = 14 (CH:69 lower-case 'should')",
+   "observed": "13: ['h02', 'h03', 'h04', 'h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 399,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=ABAAAaHpYh7uhy 14",
+   "note": "AROUND msgid=#12",
+   "expected": "min(limit, available) = 13 (CH:69 lower-case 'should')",
+   "observed": "9: ['h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 400,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist timestamp=2026-11-17T12:01:24.206Z 14",
+   "note": "AROUND ts=#12",
+   "expected": "min(limit, available) = 14 (CH:69 lower-case 'should')",
+   "observed": "9: ['h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 407,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=ABAAAaHpYh7uhy 19",
+   "note": "AROUND msgid=#12",
+   "expected": "min(limit, available) = 13 (CH:69 lower-case 'should')",
+   "observed": "11: ['h04', 'h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 408,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist timestamp=2026-11-17T12:01:24.206Z 19",
+   "note": "AROUND ts=#12",
+   "expected": "min(limit, available) = 14 (CH:69 lower-case 'should')",
+   "observed": "11: ['h04', 'h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 431,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=ABAAAaHpYh70hz 3",
+   "note": "AROUND msgid=#13",
+   "expected": "min(limit, available) = 3 (CH:69 lower-case 'should')",
+   "observed": "2: ['h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 432,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist timestamp=2026-11-17T12:01:24.212Z 3",
+   "note": "AROUND ts=#13",
+   "expected": "min(limit, available) = 3 (CH:69 lower-case 'should')",
+   "observed": "2: ['h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 439,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=ABAAAaHpYh70hz 14",
+   "note": "AROUND msgid=#13",
+   "expected": "min(limit, available) = 13 (CH:69 lower-case 'should')",
+   "observed": "8: ['h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 440,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist timestamp=2026-11-17T12:01:24.212Z 14",
+   "note": "AROUND ts=#13",
+   "expected": "min(limit, available) = 14 (CH:69 lower-case 'should')",
+   "observed": "8: ['h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 447,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=ABAAAaHpYh70hz 19",
+   "note": "AROUND msgid=#13",
+   "expected": "min(limit, available) = 13 (CH:69 lower-case 'should')",
+   "observed": "10: ['h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 448,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist timestamp=2026-11-17T12:01:24.212Z 19",
+   "note": "AROUND ts=#13",
+   "expected": "min(limit, available) = 14 (CH:69 lower-case 'should')",
+   "observed": "10: ['h05', 'h06', 'h07', 'h08', 'h10', 'h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 456,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist timestamp=2026-11-17T12:01:25.212Z 3",
+   "note": "AROUND ts=off-message",
+   "expected": "min(limit, available) = 3 (CH:69 lower-case 'should')",
+   "observed": "1: ['h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 863,
+   "cmd": "CHATHISTORY AROUND #hapqbrtlc timestamp=2026-11-17T12:01:25.228Z 3",
+   "note": "AROUND ts=off-message",
+   "expected": "min(limit, available) = 3 (CH:69 lower-case 'should')",
+   "observed": "1: ['t4']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 871,
+   "cmd": "CHATHISTORY AROUND #hapqbrtlc timestamp=2026-11-17T12:01:24.225Z 3",
+   "note": "AROUND ts=off-message",
+   "expected": "min(limit, available) = 3 (CH:69 lower-case 'should')",
+   "observed": "2: ['t3', 't4']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 984,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=ABAAAaHpYh70hz 3",
+   "note": "AROUND msgid=replayed-newest",
+   "expected": "min(limit, available) = 3 (CH:69 lower-case 'should')",
+   "observed": "2: ['h13', 'h14']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "EXACT",
+   "i": 1001,
+   "cmd": "CHATHISTORY AROUND #hapqbrtlc msgid=ABAAAaHpYh8Eh3 3",
+   "note": "AROUND msgid=replayed-newest",
+   "expected": "min(limit, available) = 3 (CH:69 lower-case 'should')",
+   "observed": "2: ['t3', 't4']",
+   "class": "latitude (CH:69 MAY return fewer)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1634,
+   "cmd": "CHATHISTORY LATEST #hapqbrhist msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1634;time=2026-11-17T12:01:24.671Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR LATEST #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1635,
+   "cmd": "CHATHISTORY BEFORE #hapqbrhist msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1635;time=2026-11-17T12:01:24.671Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR BEFORE #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1636,
+   "cmd": "CHATHISTORY AFTER #hapqbrhist msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1636;time=2026-11-17T12:01:24.671Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR AFTER #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1637,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1637;time=2026-11-17T12:01:24.671Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR AROUND #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1638,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrhist msgid=zzzz-not-a-msgid-0000 msgid=ABAAAaHpYh70hz 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1638;time=2026-11-17T12:01:24.672Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR BETWEEN #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1639,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrhist msgid=ABAAAaHpYh5uhm msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1639;time=2026-11-17T12:01:24.672Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR BETWEEN #hapqbrhist zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1641,
+   "cmd": "CHATHISTORY BEFORE #hapqbrhist msgid=ABAAAaHpYh8Kh4 5",
+   "note": "msgid from another channel",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "5 lines: ['h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1643,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=ABAAAaHpYh8Kh4 5",
+   "note": "msgid from another channel",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "2 lines: ['h13', 'h14']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1645,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrhist msgid=ABAAAaHpYh5uhm msgid=ABAAAaHpYh8Kh4 5",
+   "note": "msgid from another channel",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "5 lines: ['h02', 'h03', 'h04', 'h05', 'h06']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1647,
+   "cmd": "CHATHISTORY BEFORE #hapqbrhist msgid=ABAAAaHpYh8Vh6 5",
+   "note": "msgid of a DM line",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "5 lines: ['h09', 'h11', 'h12', 'h13', 'h14']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1649,
+   "cmd": "CHATHISTORY AROUND #hapqbrhist msgid=ABAAAaHpYh8Vh6 5",
+   "note": "msgid of a DM line",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "2 lines: ['h13', 'h14']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1651,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrhist msgid=ABAAAaHpYh5uhm msgid=ABAAAaHpYh8Vh6 5",
+   "note": "msgid of a DM line",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "5 lines: ['h02', 'h03', 'h04', 'h05', 'h06']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1652,
+   "cmd": "CHATHISTORY LATEST #hapqbrtlc msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1652;time=2026-11-17T12:01:24.674Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR LATEST #hapqbrtlc zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1653,
+   "cmd": "CHATHISTORY BEFORE #hapqbrtlc msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1653;time=2026-11-17T12:01:24.674Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR BEFORE #hapqbrtlc zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1654,
+   "cmd": "CHATHISTORY AFTER #hapqbrtlc msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1654;time=2026-11-17T12:01:24.674Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR AFTER #hapqbrtlc zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1655,
+   "cmd": "CHATHISTORY AROUND #hapqbrtlc msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1655;time=2026-11-17T12:01:24.674Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR AROUND #hapqbrtlc zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1656,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrtlc msgid=zzzz-not-a-msgid-0000 msgid=ABAAAaHpYh8Eh3 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1656;time=2026-11-17T12:01:24.674Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR BETWEEN #hapqbrtlc zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1657,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrtlc msgid=ABAAAaHpYh75h0 msgid=zzzz-not-a-msgid-0000 5",
+   "note": "unknown msgid",
+   "expected": "a page",
+   "observed": "@label=L1657;time=2026-11-17T12:01:24.674Z :irc.conformance.test FAIL CHATHISTORY MESSAGE_ERROR BETWEEN #hapqbrtlc zzzz-not-a-msgid-0000 :Unknown message id",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1659,
+   "cmd": "CHATHISTORY BEFORE #hapqbrtlc msgid=ABAAAaHpYh8Kh4 5",
+   "note": "msgid from another channel",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "4 lines: ['t1', 't2', 't3', 't4']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "END",
+   "i": 1659,
+   "cmd": "CHATHISTORY BEFORE #hapqbrtlc msgid=ABAAAaHpYh8Kh4 5",
+   "note": "msgid from another channel",
+   "expected": "no end tag",
+   "observed": "tagged",
+   "class": ""
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1661,
+   "cmd": "CHATHISTORY AROUND #hapqbrtlc msgid=ABAAAaHpYh8Kh4 5",
+   "note": "msgid from another channel",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "2 lines: ['t3', 't4']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1663,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrtlc msgid=ABAAAaHpYh75h0 msgid=ABAAAaHpYh8Kh4 5",
+   "note": "msgid from another channel",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "3 lines: ['t2', 't3', 't4']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "END",
+   "i": 1663,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrtlc msgid=ABAAAaHpYh75h0 msgid=ABAAAaHpYh8Kh4 5",
+   "note": "msgid from another channel",
+   "expected": "no end tag",
+   "observed": "tagged",
+   "class": ""
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1665,
+   "cmd": "CHATHISTORY BEFORE #hapqbrtlc msgid=ABAAAaHpYh8Vh6 5",
+   "note": "msgid of a DM line",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "4 lines: ['t1', 't2', 't3', 't4']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "END",
+   "i": 1665,
+   "cmd": "CHATHISTORY BEFORE #hapqbrtlc msgid=ABAAAaHpYh8Vh6 5",
+   "note": "msgid of a DM line",
+   "expected": "no end tag",
+   "observed": "tagged",
+   "class": ""
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1667,
+   "cmd": "CHATHISTORY AROUND #hapqbrtlc msgid=ABAAAaHpYh8Vh6 5",
+   "note": "msgid of a DM line",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "2 lines: ['t3', 't4']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "UNKNOWN",
+   "i": 1669,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrtlc msgid=ABAAAaHpYh75h0 msgid=ABAAAaHpYh8Vh6 5",
+   "note": "msgid of a DM line",
+   "expected": "empty batch or FAIL (D5, MI-5)",
+   "observed": "3 lines: ['t2', 't3', 't4']",
+   "class": "violation of the D5 restriction"
+  },
+  {
+   "prop": "END",
+   "i": 1669,
+   "cmd": "CHATHISTORY BETWEEN #hapqbrtlc msgid=ABAAAaHpYh75h0 msgid=ABAAAaHpYh8Vh6 5",
+   "note": "msgid of a DM line",
+   "expected": "no end tag",
+   "observed": "tagged",
+   "class": ""
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1672,
+   "cmd": "CHATHISTORY LATEST #hapqbrnojoin * 10",
+   "note": "target not joined",
+   "expected": "a page",
+   "observed": "@label=L1672;time=2026-11-17T12:01:24.676Z :irc.conformance.test FAIL CHATHISTORY INVALID_TARGET LATEST #hapqbrnojoin :No access to target",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "FAILREPLY",
+   "i": 1673,
+   "cmd": "CHATHISTORY BEFORE #hapqbrnojoin timestamp=2026-11-17T12:02:24.676Z 10",
+   "note": "target not joined",
+   "expected": "a page",
+   "observed": "@label=L1673;time=2026-11-17T12:01:24.676Z :irc.conformance.test FAIL CHATHISTORY INVALID_TARGET BEFORE #hapqbrnojoin :No access to target",
+   "class": "info: FAIL is a completion (CH-7)"
+  },
+  {
+   "prop": "NOAUTO",
+   "i": null,
+   "cmd": "",
+   "note": "",
+   "expected": "no playback on JOIN (CH:41)",
+   "observed": "[':irc.conformance.test NOTICE hapqbrl :on 5 ca 5(100) ft 10(10)']",
+   "class": ""
+  }
+ ],
+ "untagged_last": [
+  5,
+  51,
+  52,
+  107,
+  108,
+  148,
+  188,
+  228,
+  369,
+  370,
+  373,
+  374,
+  561,
+  562,
+  585,
+  586,
+  609,
+  610,
+  611,
+  612,
+  633,
+  634,
+  635,
+  636,
+  756,
+  785,
+  786,
+  787,
+  789,
+  792,
+  796,
+  808,
+  809,
+  811,
+  812,
+  813,
+  818,
+  864,
+  866,
+  869,
+  872,
+  873,
+  874,
+  875,
+  876,
+  877,
+  878,
+  879,
+  987,
+  991,
+  997,
+  1098,
+  1164,
+  1192,
+  1193,
+  1196,
+  1197,
+  1217,
+  1221,
+  1246,
+  1247,
+  1250,
+  1251,
+  1488,
+  1506,
+  1510,
+  1526,
+  1629
+ ],
+ "events_replayed": []
+}
