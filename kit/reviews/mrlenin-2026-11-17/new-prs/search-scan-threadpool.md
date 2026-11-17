@@ -1,10 +1,10 @@
 # New draft PR (opened as #296): the federated SEARCH scan on the thread pool (follow-up to #252, gist Q6)
 
 - Repository: evilnet/nefarious2, base `ircv3.2-upgrade`
-- Head: `rdrake:fix/search-scan-threadpool` (1040f7cc)
+- Head: `rdrake:fix/search-scan-threadpool` (e15643b3)
 - Draft: yes
 - Title: `chathistory: the federated SEARCH responder scans on the thread pool`
-- The branch sits on #252's head (35ec75e7), so until #252 merges this PR's diff shows #252's 4 commits too. Its own commits are the last 16.
+- The branch sits on #252's head (9a965499), so until #252 merges this PR's diff shows #252's 4 commits too. Its own commits are the last 16.
 
 ## Body
 
