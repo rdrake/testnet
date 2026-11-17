@@ -1,4 +1,4 @@
-# nefarious2 draft PRs: open questions (updated 2026-11-17 20:16 UTC)
+# nefarious2 draft PRs: open questions (updated 2026-11-17 20:17 UTC)
 
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
@@ -15,7 +15,6 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q3 | #245 | Restored session whose nick another account holds: skip or fallback nick? | 🟡 OPEN |
 | Q4 | #246/#247 | Rehash pre-check mechanism | 🟡 OPEN |
 | Q5 | #246 | GitSync when the check itself crashes | 🟡 OPEN |
-| Q11 | #261 | Split into three PRs? | 🟡 OPEN |
 | Q12 | #261 | Does `sslfp = ""` mean "no fingerprint required"? | 🟡 OPEN |
 | Q14 | #289 | Offer the old `evilnet/channel-relocate` name for a transition release? | 🟡 OPEN |
 | Q15 | #280 | Fix shape for a services rename of a bouncer session's account | 🟡 OPEN |
@@ -26,6 +25,7 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q8 | #253 | Does cap-less use of the extras end? | ✅ RESOLVED: never |
 | Q9 | #253 | Must Seance #327 ship before `PERSISTENCE_DRAFT_EXTRAS` goes FALSE? | ✅ RESOLVED: nef2 goes ahead; Seance tracked in evilnet/seance#333 |
 | Q10 | #253 | Capability name form | ✅ RESOLVED: `evilnet.github.io/persistence` |
+| Q11 | #261 | Split into three PRs? | ✅ RESOLVED: yes, one PR per bug (and #262 likewise) |
 | Q13 | #253 | Cap-gating unsolicited output (restore batch, SET line) | ✅ RESOLVED: gated |
 | Q17 | #289 | Move old vendor names to the DNS form? | ✅ RESOLVED: yes, draft #289 |
 
@@ -62,11 +62,6 @@ If the child process stays (#246 only), what does GitSync do when the check itse
 - refuse the commit after one crash **(current)**;
 - treat the result as unknown and proceed;
 - refuse only after a second failure.
-
-### Q11 · #261 res, ssl, nick: one PR or three?
-Status: 🟡 OPEN
-
-#261 carries three independent inherited-bug fixes. Should it be split into three PRs, one per bug, following the one-subject-per-PR practice?
 
 ### Q12 · #261 an empty `sslfp`
 Status: 🟡 OPEN
@@ -147,6 +142,13 @@ Status: ✅ RESOLVED (2026-11-17)
 **Decision:** `evilnet.github.io/persistence`.
 
 **Why:** vendor-specific capability names "are prefixed by a valid DNS domain name" (`extensions/capability-negotiation.md:510`, cited by ibutsu), which `evilnet/<name>` is not.
+
+### Q11 · #261 res, ssl, nick: one PR or three?
+Status: ✅ RESOLVED (2026-11-17, split in progress)
+
+**Decision:** split into three PRs, one per bug (res `irc_in_addr_valid()`, ssl `verify_sslclifp()`, nick `ms_nick()` collision), and the master twin #262 the same way. The `-Waddress` pragma cleanup goes with the ssl PR, and so does Q12.
+
+**Why:** the repository's practice is one subject per PR.
 
 ### Q13 · #253 cap-gating unsolicited output
 Status: ✅ RESOLVED (2026-11-17, done in 1b414b16)
