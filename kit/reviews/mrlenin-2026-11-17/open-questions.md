@@ -46,7 +46,7 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
   - the capability `evilnet/channel-relocate` (`ircd/m_cap.c:372`), which `capability-negotiation.md:510` says should be DNS-prefixed;
   - the ISUPPORT token `evilnet/CHATHISTORYRETENTION` (`ircd/m_chathistory.c:4588`).
 
-  ibutsu (2026-11-17): "isupport tokens don't really get any clarification, and I've only seen "draft/" ones, but maybe they're supposed to use the full name too". The IRCv3 specs only show `draft/` ISUPPORT tokens (`draft/ICON`, `draft/ACCOUNTREQUIRED`). In practice soju already sends `soju.im/FILEHOST` next to `draft/FILEHOST`; the testnet's own 005 carries both. Either rename would be client-visible and needs a transition (both names for a while), like #253.
+  ibutsu (2026-11-17): "isupport tokens don't really get any clarification, and I've only seen "draft/" ones, but maybe they're supposed to use the full name too". The IRCv3 specs only show `draft/` ISUPPORT tokens (`draft/ICON`, `draft/ACCOUNTREQUIRED`). In practice soju uses its DNS name for its own ISUPPORT tokens as well as its capabilities: `soju.im/SAFERATE` and `soju.im/FILEHOST` (soju de8690c, `downstream.go:294`, `:1342`; `doc/ext/filehost.md:26`), next to caps such as `soju.im/bouncer-networks` and `soju.im/read`. Either rename would be client-visible and needs a transition (both names for a while), like #253.
 
 ## Merge order notes (no decision needed)
 - Whichever of #232 and #252 lands second needs `requester_type_mask()`.
