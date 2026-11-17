@@ -1,4 +1,4 @@
-# nefarious2 draft PRs: open questions (updated 2026-11-17 21:00 UTC)
+# nefarious2 draft PRs: open questions (updated 2026-11-17 20:53 UTC)
 
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
@@ -18,7 +18,7 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q12 | #291/#294 | Does `sslfp = ""` mean "no fingerprint required"? | 🟡 OPEN |
 | Q16 | testnet | Is `testnet-svc/data/x3.conf` meant to be used, or stale? | 🟡 OPEN |
 | Q1 | #242 | Accept `+00:00` timestamps? | ✅ RESOLVED: no, spec form only |
-| Q6 | #252 | Which channels a no-`in=` SEARCH federates; scan cost | ✅ RESOLVED: keep scope, scan to the thread pool |
+| Q6 | #252 | Which channels a no-`in=` SEARCH federates; scan cost | ✅ RESOLVED: keep scope, scan to the thread pool (#296) |
 | Q7 | #253 | Extras as `PERSISTENCE` subcommands or their own command? | ✅ RESOLVED: subcommands |
 | Q8 | #253 | Does cap-less use of the extras end? | ✅ RESOLVED: never |
 | Q9 | #253 | Must Seance #327 ship before `PERSISTENCE_DRAFT_EXTRAS` goes FALSE? | ✅ RESOLVED: nef2 goes ahead; Seance tracked in evilnet/seance#333 |
@@ -94,7 +94,7 @@ Status: ✅ RESOLVED (2026-11-17, done in 1ec4bc92)
 ### Q6 · #252 which channels a SEARCH without `in=` federates
 Status: ✅ RESOLVED (2026-11-17)
 
-**Decision:** #252 keeps its scope (up to 8 of the requester's channels). The cost, about 2 s of a storage peer's main loop for 8 channels of 50 000 rows, is fixed by moving the SEARCH store walk to the thread pool in a separate follow-up PR built on #252 (`fix/search-scan-threadpool`, see `new-prs/search-scan-threadpool.md`).
+**Decision:** #252 keeps its scope (up to 8 of the requester's channels). The cost, about 2 s of a storage peer's main loop for 8 channels of 50 000 rows, is fixed by moving the SEARCH store walk to the thread pool in a separate follow-up PR built on #252 (draft evilnet/nefarious2#296).
 
 **Why:** ibutsu: "rocksdb reads are thread safe and we can use the threadpool for them".
 
