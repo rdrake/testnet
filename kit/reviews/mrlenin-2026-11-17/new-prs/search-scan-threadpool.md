@@ -1,15 +1,17 @@
 # New draft PR (opened as #296): the federated SEARCH scan on the thread pool (follow-up to #252, gist Q6)
 
 - Repository: evilnet/nefarious2, base `ircv3.2-upgrade`
-- Head: `rdrake:fix/search-scan-threadpool` (0ea10c9a)
+- Head: `rdrake:fix/search-scan-threadpool` (1040f7cc)
 - Draft: yes
 - Title: `chathistory: the federated SEARCH responder scans on the thread pool`
-- The branch sits on #252's head (35ec75e7), so until #252 merges this PR's diff shows #252's 4 commits too. Its own commits are the last 15.
+- The branch sits on #252's head (35ec75e7), so until #252 merges this PR's diff shows #252's 4 commits too. Its own commits are the last 16.
 
 ## Body
 
 ```
-Follow-up to #252, stacked on it: until #252 merges, this diff includes its commits. This PR's own are the last fifteen, from `log: let a thread pool worker mute its own logging`.
+Follow-up to #252, stacked on it: until #252 merges, this diff includes its commits. This PR's own are the last sixteen, from `log: let a thread pool worker mute its own logging`.
+
+**Merge order with #237:** #237 starts the thread pool after ircd.conf is read, so `THREAD_POOL_SIZE` takes effect; this PR leaves that to it and does not move the pool start. Both touch `ircd_log.c`, `thread_pool.c`, `readme.features` (each adds a `THREAD_POOL_SIZE` entry in the same place) and the log tests, so whichever merges second needs a small rebase; the two `THREAD_POOL_SIZE` entries become one.
 
 **Summary**
 
@@ -32,9 +34,9 @@ Each CH Q S scans up to 50,000 rows, and one SEARCH without `in=` asks every sto
   - The worker runs `search_walk()` on that alone.
   - `search_job_done()` sends the rows and `E <reqid> <n>` (`T` when the budget cut the scan or the cut limit was filled, `E <reqid> 0 U` on a store error).
   - A job whose asking server has left sends nothing: `chathistory_fed_cleanup_link()` detaches it, and `done()` checks the link again.
-- `ircd.c`: the pool's signal pipe is now registered with the event engine. It never was, so a finished task waited for the next timer or packet (1–3 s for a federated SEARCH on a quiet test pair, under 0.15 s now). OPER, SETHOST and WEBIRC password checks gain the same. The pool is now started after ircd.conf is read: it was started before, so `THREAD_POOL_SIZE` from ircd.conf never applied and every pool had 4 workers.
+- `ircd.c`: the pool's signal pipe is now registered with the event engine. It never was, so a finished task waited for the next timer or packet (1–3 s for a federated SEARCH on a quiet test pair, under 0.15 s now). OPER, SETHOST and WEBIRC password checks gain the same. The pipe is registered just before the listeners open, apart from the pool's start, which #237 moves.
 - `ircd_log.c`: a worker can mute its own logging; the walk's log lines and the backend's last-error text are dropped on a worker instead of raced for. A redaction that could not be read is counted in the walk and logged on the main thread, and so is a scan that could not read the store. One line is not dropped: a failed `assert()` on a worker goes out through `log_dying_line()`, to syslog and, when the server kept its stderr (`-t`, `-x`), to descriptor 2.
-- `doc/readme.features` documents `THREAD_POOL_SIZE` (read once at start, from ircd.conf).
+- `doc/readme.features` documents `THREAD_POOL_SIZE` (read once at start) and what runs on the pool.
 
 **Thread safety**
 
@@ -60,7 +62,6 @@ Each CH Q S scans up to 50,000 rows, and one SEARCH without `in=` asks every sto
   - federated results equal the store server's local results (up to the requester's existing 500-row cap per leg);
   - killing the requester with 120 scans in flight leaves the store server up;
   - SIGTERM on the store server with scans in flight shuts down cleanly;
-  - `THREAD_POOL_SIZE` set to 2 in one server's ircd.conf gives that server 2 workers.
 - The out-of-memory exit on a worker is tested at the allocator (`alloc_nomem_cmocka`), not by starving a running server.
 
 **Not in this PR**
@@ -68,5 +69,5 @@ Each CH Q S scans up to 50,000 rows, and one SEARCH without `in=` asks every sto
 - The requester's own scan (`m_search`) stays on the main loop: its channels share one scan budget in sequence and each channel's federated part starts between two walks, so moving it means rewriting `m_search` as a state machine. One budget per SEARCH remains there (about 0.25 s at worst), not eight.
 - With several storage servers and a limit over 500, the requester still keeps the first 500 rows to arrive across them (`MAX_FED_MESSAGES`); reachable only with `CHATHISTORY_MAX` above 500.
 - The other `CH Q` subcommands still take the limit as the asking server sent it.
-- `ASYNC_LOGGING` is read before ircd.conf, as `THREAD_POOL_SIZE` was, so setting it there does nothing; a separate issue.
+- `THREAD_POOL_SIZE` and `ASYNC_LOGGING` from ircd.conf: both are read before ircd.conf today, so setting them there does nothing. #237 fixes both.
 ```
