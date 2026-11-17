@@ -35,7 +35,9 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
 
 ## #253 persistence: the extras move to `evilnet.github.io/persistence`
 7. Do the extras (ATTACH, DETACH, LIST, PROFILE, REPLAY) stay `PERSISTENCE` subcommands under the vendor capability **(current)**, or move to a vendor command of their own?
+   - **Dev input (ibutsu, 2026-11-17):** "the proposed spec says unknown subcommands should be ignored, so it allows for extending really." This supports keeping the extras as `PERSISTENCE` subcommands.
 8. Does cap-less use of the extras end with this change, or only when `PERSISTENCE_DRAFT_EXTRAS` goes FALSE **(current)**?
+   - **Dev input (ibutsu, 2026-11-17):** "Not allowing the command without the cap blocks bouncer users without the CAP from adjusting the auto-replay, so that's something to consider." At #253's head (e10e4c08), `REPLAY` (the auto-replay setting) is one of the gated extras (`persistence_extras_allowed()`, `ircd/m_persistence.c:1009`, gate at `:1051`). So once `PERSISTENCE_DRAFT_EXTRAS` is FALSE, a client without `evilnet.github.io/persistence` cannot change auto-replay.
 9. Ordering with Seance: should evilnet/seance#327 merge and deploy before `PERSISTENCE_DRAFT_EXTRAS` is turned off? (While it is on, Seance develop sees no change.)
 10. **Decided (2026-11-17):** the capability's name is `evilnet.github.io/persistence`. Vendor-specific capability names "are prefixed by a valid DNS domain name" (`extensions/capability-negotiation.md:510`, cited by ibutsu), which `evilnet/<name>` is not.
 
