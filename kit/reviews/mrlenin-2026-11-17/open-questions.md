@@ -1,4 +1,4 @@
-# nefarious2 draft PRs: open questions (updated 2026-11-17 20:53 UTC)
+# nefarious2 draft PRs: open questions (updated 2026-11-17 22:20 UTC)
 
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
@@ -11,69 +11,29 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 
 | ID | PR | Question | Status |
 |----|----|----------|--------|
-| Q2 | #245 | Session live at a newer build's crash: expire or keep holding? | 🟡 OPEN |
-| Q3 | #245 | Restored session whose nick another account holds: skip or fallback nick? | 🟡 OPEN |
-| Q4 | #246/#247 | Rehash pre-check mechanism | 🟡 OPEN |
-| Q5 | #246 | GitSync when the check itself crashes | 🟡 OPEN |
-| Q12 | #291/#294 | Does `sslfp = ""` mean "no fingerprint required"? | 🟡 OPEN |
-| Q16 | testnet | Is `testnet-svc/data/x3.conf` meant to be used, or stale? | 🟡 OPEN |
 | Q1 | #242 | Accept `+00:00` timestamps? | ✅ RESOLVED: no, spec form only |
+| Q2 | #245 | Session live at a newer build's crash: expire or keep holding? | ✅ RESOLVED: expire (current), no heartbeat work |
+| Q3 | #245 | Restored session whose nick another account holds: skip or fallback nick? | ✅ RESOLVED: skip (current) |
+| Q4 | #246/#247 | Rehash pre-check mechanism | ✅ RESOLVED: child-process check (current), simplified |
+| Q5 | #246 | GitSync when the check itself crashes | ✅ RESOLVED: apply only on a clean pass; else put back, retry next sync |
 | Q6 | #252 | Which channels a no-`in=` SEARCH federates; scan cost | ✅ RESOLVED: keep scope, scan to the thread pool (#296) |
 | Q7 | #253 | Extras as `PERSISTENCE` subcommands or their own command? | ✅ RESOLVED: subcommands |
 | Q8 | #253 | Does cap-less use of the extras end? | ✅ RESOLVED: never |
 | Q9 | #253 | Must Seance #327 ship before `PERSISTENCE_DRAFT_EXTRAS` goes FALSE? | ✅ RESOLVED: nef2 goes ahead; Seance tracked in evilnet/seance#333 |
 | Q10 | #253 | Capability name form | ✅ RESOLVED: `evilnet.github.io/persistence` |
 | Q11 | #261 | Split into three PRs? | ✅ RESOLVED: yes, one PR per bug (and #262 likewise) |
+| Q12 | #291/#294 | Does `sslfp = ""` mean "no fingerprint required"? | ✅ RESOLVED: refuse every client (current); closes a small hole |
 | Q13 | #253 | Cap-gating unsolicited output (restore batch, SET line) | ✅ RESOLVED: gated |
 | Q14 | #289 | Offer the old `evilnet/channel-relocate` name for a transition release? | ✅ RESOLVED: no, as #289 does |
 | Q15 | #280 | Fix shape for a services rename of a bouncer session's account | ✅ RESOLVED: re-file on rename, low priority (moot on Afternet) |
+| Q16 | testnet | Is `testnet-svc/data/x3.conf` meant to be used, or stale? | ✅ RESOLVED: stale; deleted |
 | Q17 | #289 | Move old vendor names to the DNS form? | ✅ RESOLVED: yes, draft #289 |
 
 ---
 
 # 🟡 OPEN: needs an answer
 
-### Q2 · #245 bouncer: rollback keeps a newer build's session records
-Status: 🟡 OPEN
-
-A session was live when a newer build crashed; an older build then ran, and the newer build came back. What happens to the session?
-- expire it at the roll-forward **(current)**;
-- keep holding it from the crash. This needs the older build to keep the newer one's last heartbeat, for example under a per-writer key `bouncer/alive/<writer>`.
-
-### Q3 · #245 bouncer: restore with a taken nick
-Status: 🟡 OPEN
-
-At restore, another account's restored session already holds this session's nick.
-- skip it; its record stays until its hold ends **(current)**;
-- restore it under a fallback nick.
-
-### Q4 · #246 / #247 rehash: the pre-check mechanism
-Status: 🟡 OPEN
-
-How should a configuration with errors be caught before a rehash applies it?
-- a child-process check (`ircd -k` in a fresh process) **(current)**;
-- parse into staged structures, swapped in only on success;
-- an in-process syntax-only pass (catches syntax errors and missing includes, not semantic ones).
-
-### Q5 · #246 GitSync when the check fails to run
-Status: 🟡 OPEN
-
-If the child process stays (#246 only), what does GitSync do when the check itself crashes or cannot run?
-- refuse the commit after one crash **(current)**;
-- treat the result as unknown and proceed;
-- refuse only after a second failure.
-
-### Q12 · #291 / #294 an empty `sslfp`
-Status: 🟡 OPEN
-
-What should `sslfp = "";` in a block mean?
-- refuse every client **(current)**;
-- treat an empty `sslfp` as no requirement.
-
-### Q16 · testnet: which X3 config is live
-Status: 🟡 OPEN
-
-In the testnet-svc compose setup, X3 reads `/x3/data/x3.conf` from the `x3_data` volume (seeded from `x3/docker/x3.conf-dist`), not `testnet-svc/data/x3.conf`. Is `data/x3.conf` meant to be used, or is it stale?
+None. Every question is resolved.
 
 ---
 
@@ -90,6 +50,32 @@ Status: ✅ RESOLVED (2026-11-17, done in 1ec4bc92)
 `+00:00`, a missing `Z` or fraction, and a fraction of another length are refused with `FAIL ... INVALID_PARAMS`.
 
 **Why:** `extensions/chathistory.md:67`: "A `timestamp` parameter MUST have the format `timestamp=YYYY-MM-DDThh:mm:ss.sssZ`". `read-marker.md:52` says the same. ibutsu: "technically a spec violation, so it's really a matter of how strict we want to be".
+
+### Q2 · #245 bouncer: rollback keeps a newer build's session records
+Status: ✅ RESOLVED (2026-11-17, no code change)
+
+**Decision:** expire it at the roll-forward, as #245 does. No per-build heartbeat.
+
+**Why (Rubin):** downgrades across a record format bump are rare, and the worst outcome is that someone reconnects and rejoins their channels. No more machinery for the rollback-then-roll-forward round trip.
+
+### Q3 · #245 bouncer: restore with a taken nick
+Status: ✅ RESOLVED (2026-11-17, no code change)
+
+**Decision:** skip it, as #245 does. No fallback nick. Same reason as Q2.
+
+### Q4 · #246 / #247 rehash: the pre-check mechanism
+Status: ✅ RESOLVED (2026-11-17, simplified: #246 ca340ea7, #247 8fd5fb08)
+
+**Decision:** keep the child-process check (`ircd -k`). Staged parsing would be the ideal design some day.
+
+**Done:** the check now has three results only (clean pass, errors, did not finish cleanly), and only a clean pass applies. The "did not run, go ahead" path and the re-check of a changed file are gone.
+
+### Q5 · #246 GitSync when the check fails to run
+Status: ✅ RESOLVED (2026-11-17, #246 ca340ea7)
+
+**Decision (Rubin):** none of the three as written. GitSync applies a commit only when the check passes. Anything else (crashed, killed from outside, could not start, timed out) puts the old file back and retries at the next sync, with no distinction between signals: an OOM kill can be the file's fault too, and an unchecked config from git is never applied. Errors found refuse the content until it changes, as before.
+
+**Done:** `conf_file_check()` and the second rehash after an abandon are removed.
 
 ### Q6 · #252 which channels a SEARCH without `in=` federates
 Status: ✅ RESOLVED (2026-11-17)
@@ -135,6 +121,13 @@ Status: ✅ RESOLVED (2026-11-17, done: #290–#295; #261 and #262 closed)
 
 **Why:** the repository's practice is one subject per PR.
 
+### Q12 · #291 / #294 an empty `sslfp`
+Status: ✅ RESOLVED (2026-11-17, no code change; descriptions corrected)
+
+**Decision (Rubin):** refuse every client, as #291/#294 do.
+
+**Correction:** the PRs said this keeps today's behaviour. It closes a small hole instead: before the fix, a client with no certificate has an empty fingerprint, which compared equal to an empty `sslfp` and passed.
+
 ### Q13 · #253 cap-gating unsolicited output
 Status: ✅ RESOLVED (2026-11-17, done in 1b414b16)
 
@@ -157,6 +150,11 @@ Status: ✅ RESOLVED (2026-11-17, low priority, #280 stays open)
 **Decision:** making a rename work (each server re-files the session under the new name on an `M` from services, merging by session id) is the right fix, but low priority. Nothing is changed now; evilnet/nefarious2#280 stays open as the record.
 
 **Why:** ibutsu: moot for Afternet, where account renames are not allowed. Rubin noted that, as things stand, a rename is a desync trap across netsplits.
+
+### Q16 · testnet: which X3 config is live
+Status: ✅ RESOLVED (2026-11-17, testnet 51074c9)
+
+**Decision:** stale. X3's configuration is generated in the image from `x3.conf-dist` and the `X3_*` variables; nothing reads `data/x3.conf`, so it is deleted, and the README, a script and a test comment stop naming it.
 
 ### Q17 · old vendor names to the DNS form
 Status: ✅ RESOLVED (2026-11-17, draft evilnet/nefarious2#289)
