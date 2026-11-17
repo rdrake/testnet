@@ -35,7 +35,7 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
 7. Do the extras (ATTACH, DETACH, LIST, PROFILE, REPLAY) stay `PERSISTENCE` subcommands under the vendor capability **(current)**, or move to a vendor command of their own?
 8. Does cap-less use of the extras end with this change, or only when `PERSISTENCE_DRAFT_EXTRAS` goes FALSE **(current)**?
 9. Ordering with Seance: should evilnet/seance#327 merge and deploy before `PERSISTENCE_DRAFT_EXTRAS` is turned off? (While it is on, Seance develop sees no change.)
-10. The capability's name form: `evilnet.github.io/persistence` **(current)**, a DNS name like the existing `evilnet.github.io/...` batch and tag names, or `evilnet/<name>` as `evilnet/channel-relocate` uses?
+10. **Decided (2026-11-17):** the capability's name is `evilnet.github.io/persistence`. Vendor-specific capability names "are prefixed by a valid DNS domain name" (`extensions/capability-negotiation.md:510`, cited by ibutsu), which `evilnet/<name>` is not.
 
 ## #261 res, ssl, nick: three small inherited bugs
 11. Split it into three PRs, one per bug?
