@@ -163,7 +163,7 @@ Status: ✅ RESOLVED (2026-11-17, no code change)
 Status: ✅ RESOLVED (2026-11-17, draft evilnet/nefarious2#289)
 
 **Decision:** both move to the DNS form.
-- The capability `evilnet/channel-relocate` becomes `evilnet.github.io/channel-relocate`. The feature `CAP_evilnet_channel_relocate` keeps its name. Whether to keep offering the old name is Q14.
+- The capability `evilnet/channel-relocate` becomes `evilnet.github.io/channel-relocate`. The feature `CAP_evilnet_channel_relocate` keeps its name. The old name is not offered (Q14).
 - The ISUPPORT token `evilnet/CHATHISTORYRETENTION` becomes `evilnet.github.io/CHATHISTORYRETENTION`. The old name is also advertised, with the same value, for a transition release.
 
 **Why:**
