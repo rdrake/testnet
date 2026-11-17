@@ -1,0 +1,2 @@
+
+**Added after review:** a refused *boolean* value now survives a REHASH too. A value that is none of TRUE, YES, ON, FALSE, NO or OFF used to be refused unmarked, so the feature went back to its default at the end of the rehash. I checked it as an oper with GET: WALLOPS_OPER_ONLY set to TRUE, then REHASH with "maybe", then REHASH with TRUE again. Before the fix this gave TRUE, FALSE, TRUE; after it, TRUE, TRUE, TRUE.
