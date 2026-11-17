@@ -30,3 +30,7 @@ Already done: the TOPIC reveal order and the `,J` comment in `format_s2s_tags_wi
 Also worth a look (found while answering Richard, not from the review): netjoin JOINs after a burst (`m_burst.c:979`) and netsplit/collision QUITs of remote users (`s_misc.c:630`) get a per-server msgid too, the same class as the reveal. Not part of #256; say in its description that they are not covered, and propose whether a follow-up is worth it.
 
 Then update bodies in `bodies-N/` and `for-ibutsu.md` (or retire it) as usual.
+
+## Who does the thinking
+
+Richard, 2026-11-17: "Use fable for the clever stuff." Design the simple, elegant forms with the Fable model, in particular parts 1.2–1.6 (the restored behaviours in a smaller shape) and 2's untagged-origin ordering fix. Routine work (tests, docs, the build dependency, descriptions) needs no special model.
