@@ -1,4 +1,4 @@
-# nefarious2 draft PRs: open questions (updated 2026-11-17 20:22 UTC)
+# nefarious2 draft PRs: open questions (updated 2026-11-17 20:25 UTC)
 
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
@@ -16,7 +16,6 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q4 | #246/#247 | Rehash pre-check mechanism | 🟡 OPEN |
 | Q5 | #246 | GitSync when the check itself crashes | 🟡 OPEN |
 | Q12 | #291/#294 | Does `sslfp = ""` mean "no fingerprint required"? | 🟡 OPEN |
-| Q15 | #280 | Fix shape for a services rename of a bouncer session's account | 🟡 OPEN |
 | Q16 | testnet | Is `testnet-svc/data/x3.conf` meant to be used, or stale? | 🟡 OPEN |
 | Q1 | #242 | Accept `+00:00` timestamps? | ✅ RESOLVED: no, spec form only |
 | Q6 | #252 | Which channels a no-`in=` SEARCH federates; scan cost | ✅ RESOLVED: keep scope, scan to the thread pool |
@@ -27,6 +26,7 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q11 | #261 | Split into three PRs? | ✅ RESOLVED: yes, one PR per bug (and #262 likewise) |
 | Q13 | #253 | Cap-gating unsolicited output (restore batch, SET line) | ✅ RESOLVED: gated |
 | Q14 | #289 | Offer the old `evilnet/channel-relocate` name for a transition release? | ✅ RESOLVED: no, as #289 does |
+| Q15 | #280 | Fix shape for a services rename of a bouncer session's account | ✅ RESOLVED: re-file on rename, low priority (moot on Afternet) |
 | Q17 | #289 | Move old vendor names to the DNS form? | ✅ RESOLVED: yes, draft #289 |
 
 ---
@@ -69,14 +69,6 @@ Status: 🟡 OPEN
 What should `sslfp = "";` in a block mean?
 - refuse every client **(current)**;
 - treat an empty `sslfp` as no requirement.
-
-### Q15 · #280 a services rename of a bouncer session's account
-Status: 🟡 OPEN
-
-X3's `RENAME` sends `AC M`, which changes every connection's account while the session stays filed under the old name. After a split and heal, both halves are killed (issue evilnet/nefarious2#280). What should the fix be?
-- each server re-files the session under the new name on an `M` from a services server, merging by session id (proposed in #280);
-- services are kept from renaming an account with a live bouncer session;
-- something else.
 
 ### Q16 · testnet: which X3 config is live
 Status: 🟡 OPEN
@@ -158,6 +150,13 @@ Status: ✅ RESOLVED (2026-11-17, no code change)
 **Decision:** don't offer the old name. #289 stays as it is: a client asking for `evilnet/channel-relocate` is NAKed and gets the PART/JOIN fallback.
 
 **Why:** nothing outside testing uses the old name, so there is no one to transition.
+
+### Q15 · #280 a services rename of a bouncer session's account
+Status: ✅ RESOLVED (2026-11-17, low priority, #280 stays open)
+
+**Decision:** making a rename work (each server re-files the session under the new name on an `M` from services, merging by session id) is the right fix, but low priority. Nothing is changed now; evilnet/nefarious2#280 stays open as the record.
+
+**Why:** ibutsu: moot for Afternet, where account renames are not allowed. Rubin noted that, as things stand, a rename is a desync trap across netsplits.
 
 ### Q17 · old vendor names to the DNS form
 Status: ✅ RESOLVED (2026-11-17, draft evilnet/nefarious2#289)
