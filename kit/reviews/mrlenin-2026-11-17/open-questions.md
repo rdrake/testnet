@@ -60,3 +60,7 @@ Decisions still needed on the draft PRs to evilnet/nefarious2 after the 2026-11-
 - Whichever of #232 and #252 lands second needs `requester_type_mask()`.
 - Whichever of #268 and #278 lands second drops #268's special case.
 - #241 lands with or before #276.
+
+## Other open questions
+- **#280, a services rename of a bouncer session's account.** X3's `RENAME` sends `AC M`, which changes every connection's account while the session stays filed under the old name; after a split and heal both halves are killed. The issue proposes that each server re-files the session under the new name on an `M` from a services server, merging by session id. Is that the shape you want? Or should services be kept from renaming an account with a live bouncer session? Or something else?
+- **testnet: which X3 config is live.** In the testnet-svc compose setup, X3 reads `/x3/data/x3.conf` from the `x3_data` volume (seeded from `x3/docker/x3.conf-dist`), not `testnet-svc/data/x3.conf`. Is `data/x3.conf` meant to be used, or is it stale?
