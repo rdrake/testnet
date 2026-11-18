@@ -1,66 +1,21 @@
-# nefarious2 drafts: six calls after the simplification pass (2026-11-17)
+# nefarious2 drafts: what changed after the simplification pass was re-evaluated (2026-11-18)
 
-Rubin asked us to stop over-engineering, so a pass removed machinery from the open drafts. Most of it was clearly unneeded. These six are judgement calls. For each: what it does, what the trim changed, and the choice. Answer by number (for example "1 keep, 2 drop").
+The earlier version of this page asked six questions about trims. The owner decided instead to re-evaluate every trim: restore what was correct, in the smallest form found, and keep a trim only where the code was really unneeded. Nothing here needs an answer; comments on the PRs are welcome.
 
----
+| PR | Outcome |
+| --- | --- |
+| #256 | Redesigned. The `,J` wire segment is gone. Each server derives the reveal JOIN's msgid from the event's msgid and the member's numeric, 1 ms before the event. No wire change, no per-connection state, and both old limits (several members on one line, a non-multiline server behind a hub) are gone. An older server in the path no longer cuts the sharing. Header dependencies are now tracked in the Makefiles. |
+| #283 | CAP DEL is targeted again, with one server-wide set of announced caps instead of per-client tracking (about 25 lines of logic). |
+| #253 | Cap values are re-announced again: a bare `CAP NEW` now carries the cap's stored value, so the generic hooks do it; no hand-written hooks. |
+| #249 | A value-only change goes to CAP 302 clients only again, decided inside `send_cap_notify()` with the same set as #283, for every valued cap. |
+| #284 | Read markers follow a rename or relocation again, through one function at three call sites. |
+| #285 | Lower-case advertised mechanisms (`plain`) are accepted again: compared case-insensitively with the advertised list and relayed in its spelling, so the credential leak stays closed. |
+| #276 | The trim engine's renamed-parent lookup is back, so a REDACT stored before its message in a renamed channel still takes it when trimmed. The distrust list and the one-batch presence move stay out. |
+| #252 | A SEARCH whose S2S query line cannot fit is refused again, instead of silently answering from one server. The one-search-per-client rule stays out. |
+| #237 | Changing THREAD_POOL_SIZE or ASYNC_LOGGING at run time logs that it takes effect at restart. Run-time switching stays out. |
+| #259 | CREATE (and now RENAME) clear rows an older build left under the name again. |
+| #282 | Unchanged: every password check is answered, so the wait needs no timeout. |
 
-## 1. #256: one msgid for a delayed-join (+D) reveal
+Not covered by #256 and left for a possible follow-up: the QUITs of remote users on a netsplit or KILL still get a per-server msgid (a small change using the same derivation). Netjoin JOINs are not stored, so they were left alone.
 
-**The bug.** A hidden (+D) member is revealed when they first speak, set the topic or get a status. Every server makes that JOIN on its own, so each one gives it a different msgid and time. Members on different servers see different msgids for the same JOIN. Federated history merges the copies as different events, so the JOIN can show up twice.
-
-**The fix.** The server the line starts on makes the msgid and sends it with that line in a new compact S2S tag segment, `,J<numeric><msgid>`. Older servers skip the segment and make their own msgid, as they do today.
-
-**Cost.** 284 lines in 11 files: a new wire segment, a per-connection field, and save/restore around the MODE double flush, the per-link multiline relay and multi-target TOPIC.
-
-**It is not obsolete.** The bug is real but small: a reveal JOIN only. Two choices:
-- **keep #256** as it is;
-- **close it** and live with per-server msgids for reveal JOINs.
-
-## 2. #283: who gets CAP DEL
-
-**Before the trim**, the server remembered which caps each client had been told about (by CAP LS, NEW or ACK), and sent CAP DEL only to those clients.
-
-**After the trim**, CAP DEL goes to every cap-notify client, as before #283. A client that was never told about a cap can get a DEL for it, which clients ignore.
-
-- **keep the trim** (simpler; about 170 lines fewer);
-- **restore the tracking**.
-
-## 3. #284: read markers across a channel rename
-
-**Before the trim**, a channel rename or relocation copied the members' read markers to the new name.
-
-**After the trim**, the new name starts with no marker. MARKREAD reports `*` until the client sets one again, so the client shows the channel as all unread once.
-
-- **keep the trim** (about 370 lines fewer; renames are rare);
-- **restore the copy**.
-
-## 4. #253: re-announcing persistence cap values
-
-**Before the trim**, changing `CAP_evilnet_persistence`, `CAP_draft_persistence` or `PERSISTENCE_DRAFT_EXTRAS` on a running server sent cap-notify clients `CAP NEW` with the new value.
-
-**After the trim**, enabling one sends a bare `CAP NEW` with no value, and flipping the extras flag sends nothing. Clients see the right value at their next `CAP LS`.
-
-- **keep the trim** (runtime flips are rare);
-- **restore the re-announce**.
-
-## 5. #285: lower-case SASL mechanism names
-
-**The leak #285 closes:** a client sends `AUTHENTICATE PLAIN` and `CAP END` together and registers. Its credentials line then arrives after registration, starts a new exchange, and the base64 credentials are sent to services as the mechanism name.
-
-**The fix kept** (after the trim): the first `AUTHENTICATE` of an exchange must look like an RFC 4422 mechanism name (upper case `A-Z 0-9 - _`, at most 24 characters). Anything else gets 908 and 904 and reaches no backend.
-
-**Side effect:** a client that sends lower-case `plain` now gets 904. Lower case is refused because a short PLAIN blob can be all letters and digits.
-
-- **keep it** as it is;
-- **allow lower case** (a one-line change; a few blobs could then still get through).
-
-## 6. #276: a rare corner after the trim
-
-#276 makes a renamed channel's history follow it. The trim dropped:
-- an in-memory "distrust" list for rename records that could not be written;
-- a trim-engine callback kept only for a row format no merged build ever wrote.
-
-**What can now happen:** in a renamed channel, a REDACT that reached the store before its original gets no link across the two names. If that REDACT row is later trimmed, the original message under the old name would show again.
-
-- **keep the trim** (needs a redaction to arrive before its message in a renamed channel, and then be evicted);
-- **restore the callback**.
+Seen while testing #256, not yet filed: on the servers that hold a hidden member, `CHATHISTORY` on a +D channel also returns the member's original hidden JOIN row.
