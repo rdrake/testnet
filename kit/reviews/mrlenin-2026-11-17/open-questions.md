@@ -1,9 +1,9 @@
-# nefarious2 draft PRs: open questions (updated 2026-11-17 22:20 UTC)
+# nefarious2 draft PRs: open questions (updated 2026-11-18 19:35 UTC)
 
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
 **How to read this:**
-- Every item has a stable ID (`Q1`…`Q16`) and exactly one status line: `Status: 🟡 OPEN` (needs an answer) or `Status: ✅ RESOLVED` (decided and done or in progress).
+- Every item has a stable ID (`Q1`…`Q18`) and exactly one status line: `Status: 🟡 OPEN` (needs an answer) or `Status: ✅ RESOLVED` (decided and done or in progress).
 - Open items come first. Resolved items stay below for the record and are never deleted.
 - To answer one, reply with its ID and the option you want.
 
@@ -15,7 +15,7 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q2 | #245 | Session live at a newer build's crash: expire or keep holding? | ✅ RESOLVED: expire (current), no heartbeat work |
 | Q3 | #245 | Restored session whose nick another account holds: skip or fallback nick? | ✅ RESOLVED: skip (current) |
 | Q4 | #246/#247 | Rehash pre-check mechanism | ✅ RESOLVED: child-process check (current), simplified |
-| Q5 | #246 | GitSync when the check itself crashes | ✅ RESOLVED: apply only on a clean pass; else put back, retry next sync |
+| Q5 | #246 | GitSync when the check itself crashes | ✅ RESOLVED: apply only on a clean pass; else put back, retry next sync (nothing refused, see Q18) |
 | Q6 | #252 | Which channels a no-`in=` SEARCH federates; scan cost | ✅ RESOLVED: keep scope, scan to the thread pool (#296) |
 | Q7 | #253 | Extras as `PERSISTENCE` subcommands or their own command? | ✅ RESOLVED: subcommands |
 | Q8 | #253 | Does cap-less use of the extras end? | ✅ RESOLVED: never |
@@ -28,6 +28,8 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | Q15 | #280 | Fix shape for a services rename of a bouncer session's account | ✅ RESOLVED: re-file on rename, low priority (moot on Afternet) |
 | Q16 | testnet | Is `testnet-svc/data/x3.conf` meant to be used, or stale? | ✅ RESOLVED: stale; deleted |
 | Q17 | #289 | Move old vendor names to the DNS form? | ✅ RESOLVED: yes, draft #289 |
+| Q18 | #246 | Do errors outside the commit refuse GitSync content? | ✅ RESOLVED: nothing is refused; every abandon retries next sync |
+| Q19 | #276 | A renamed channel's history: follow it, clear it, or leave it? | ✅ RESOLVED: leave as today; presence split out as #297 |
 
 ---
 
@@ -71,7 +73,7 @@ Status: ✅ RESOLVED (2026-11-17, simplified: #246 ca340ea7, #247 8fd5fb08)
 **Done:** the check now has three results only (clean pass, errors, did not finish cleanly), and only a clean pass applies. The "did not run, go ahead" path and the re-check of a changed file are gone.
 
 ### Q5 · #246 GitSync when the check fails to run
-Status: ✅ RESOLVED (2026-11-17, #246 ca340ea7)
+Status: ✅ RESOLVED (2026-11-17, #246 ca340ea7; refusal removed 2026-11-18, #246 4f6b0a00, see Q18)
 
 **Decision (Rubin):** none of the three as written. GitSync applies a commit only when the check passes. Anything else (crashed, killed from outside, could not start, timed out) puts the old file back and retries at the next sync, with no distinction between signals: an OOM kill can be the file's fault too, and an unchecked config from git is never applied. Errors found refuse the content until it changes, as before.
 
@@ -166,6 +168,22 @@ Status: ✅ RESOLVED (2026-11-17, draft evilnet/nefarious2#289)
 **Why:**
 - `capability-negotiation.md:510` covers the capability.
 - ISUPPORT has no rule of its own. ibutsu: "maybe they're supposed to use the full name too". soju uses its DNS name for its own capabilities and most of its own ISUPPORT tokens (`soju.im/SAFERATE`, `soju.im/FILEHOST`).
+
+### Q18 · #246 GitSync and errors outside the commit
+Status: ✅ RESOLVED (2026-11-18, #246 4f6b0a00)
+
+**Question (second review):** did Q5's "errors found refuse the content" cover errors outside the commit? As built, a valid commit was refused when ircd.conf had an error of its own, or an include was missing during the check, and stayed refused after the fix until `GITSYNC force`.
+
+**Decision:** nothing is refused after an abandoned rehash. Whatever the reason, GitSync puts the old file back and tries the content again at the next sync.
+
+**Why:** the check judges the whole configuration, so its errors need not be the commit's. Retrying is less code than a second check of the restored file. The cost: a commit that stays broken is checked and reported once per sync interval until it is fixed.
+
+### Q19 · #276 a renamed channel's history
+Status: ✅ RESOLVED (2026-11-18, draft evilnet/nefarious2#297)
+
+**Decision:** the presence part (members' intervals close under the old name and open under the new one) is split out as #297. History stays as today: rows from before a rename stay under the old name. #276 stays a draft and is not being pursued for now.
+
+**Why:** the #276 review: RENAME is low priority, the larger concern is desync between servers, and the presence part is needed whichever way history goes. Clearing the old rows at RENAME was not taken, since a rename only one side of a split executed would then delete rows a live channel still owns.
 
 ---
 
