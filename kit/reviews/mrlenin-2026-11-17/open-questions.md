@@ -181,7 +181,7 @@ Status: ✅ RESOLVED (2026-11-18, #246 4f6b0a00)
 ### Q19 · #276 a renamed channel's history
 Status: ✅ RESOLVED (2026-11-18, draft evilnet/nefarious2#297)
 
-**Decision:** the presence part (members' intervals close under the old name and open under the new one) is split out as #297. History stays as today: rows from before a rename stay under the old name. #276 stays a draft and is not being pursued for now.
+**Decision:** the presence part (members' intervals close under the old name and open under the new one) is split out as #297. History stays as today: rows from before a rename stay under the old name. #276 is closed (2026-11-18), with a pointer to #297.
 
 **Why:** the #276 review: RENAME is low priority, the larger concern is desync between servers, and the presence part is needed whichever way history goes. Clearing the old rows at RENAME was not taken, since a rename only one side of a split executed would then delete rows a live channel still owns.
 
@@ -190,4 +190,3 @@ Status: ✅ RESOLVED (2026-11-18, draft evilnet/nefarious2#297)
 ## Merge order notes (no decision needed)
 - Whichever of #232 and #252 lands second needs `requester_type_mask()`.
 - Whichever of #268 and #278 lands second drops #268's special case.
-- #241 lands with or before #276.
