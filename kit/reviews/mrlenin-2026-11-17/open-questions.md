@@ -11,7 +11,7 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 
 | ID | PR | Question | Status |
 |----|----|----------|--------|
-| Q20 | #232 | Are status messages (`PRIVMSG @#chan`) stored in history at all? | 🟡 OPEN |
+| Q20 | #232 | Are status messages (`PRIVMSG @#chan`) stored in history at all? | ✅ RESOLVED: (a) not stored; history half removed |
 | Q21 | #256 | A reveal JOIN's id and time: derived on every server, or minted once and carried? | ✅ RESOLVED: derived, as built |
 | Q22 | #296 | A full scan waiting list: scan on the main loop, or answer partial? | ✅ RESOLVED: answer partial (`E <reqid> 0 U`) |
 | Q23 | #296 | An allocation failure on a worker: exit at once, or the server's own restart? | ✅ RESOLVED: exit at once (current) |
@@ -47,7 +47,9 @@ None. Every question is resolved.
 # ✅ RESOLVED
 
 ### Q20 · #232 are status messages stored in history?
-Status: 🟡 OPEN
+Status: ✅ RESOLVED (2026-11-18, #232 cc103d62)
+
+**Decision:** (a), not stored. The tip says so itself (`ircd/ircd_relay.c`, from #226): a message for a channel's ops must not be replayed to everyone who can read its history. The history half of #232 is removed; the wire change and the NOTICE checks stay.
 
 Raised in the 2026-11-18 review. The tip deliberately does not store a `PRIVMSG @#chan` or `NOTICE +#chan`.
 - **(a) Not stored.** Keep the wire change and the NOTICE checks; the history half of #232 goes (about 450 lines).
@@ -244,5 +246,4 @@ Status: ✅ RESOLVED (2026-11-18, draft evilnet/nefarious2#297)
 ---
 
 ## Merge order notes (no decision needed)
-- Whichever of #232 and #252 lands second needs `requester_type_mask()`.
 - Whichever of #268 and #278 lands second drops #268's special case.
