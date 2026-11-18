@@ -6,3 +6,4 @@
 4. **Untested for #256:** ASan run, reveals on bouncer devices, the reveal during a channel relocation.
 5. **Codex review of #296**, held "for later if there's time".
 6. Netjoin JOINs after a burst also differ per server, but are not stored; left alone on purpose.
+7. **Unfiled, from the #296 review:** `thread_pool.c:333` reads the pending count without the lock. Minor; decide file, fix or drop.
