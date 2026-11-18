@@ -3,7 +3,7 @@
 Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review round. Each PR already implements the option marked **(current)**, so nothing is blocked; changing a choice later is a follow-up commit.
 
 **How to read this:**
-- Every item has a stable ID (`Q1`…`Q18`) and exactly one status line: `Status: 🟡 OPEN` (needs an answer) or `Status: ✅ RESOLVED` (decided and done or in progress).
+- Every item has a stable ID (`Q1`…`Q19`) and exactly one status line: `Status: 🟡 OPEN` (needs an answer) or `Status: ✅ RESOLVED` (decided and done or in progress).
 - Open items come first. Resolved items stay below for the record and are never deleted.
 - To answer one, reply with its ID and the option you want.
 
