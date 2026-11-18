@@ -12,11 +12,11 @@ Decisions on the draft PRs to evilnet/nefarious2 from the 2026-11-17 review roun
 | ID | PR | Question | Status |
 |----|----|----------|--------|
 | Q20 | #232 | Are status messages (`PRIVMSG @#chan`) stored in history at all? | 🟡 OPEN |
-| Q21 | #256 | A reveal JOIN's id and time: derived on every server, or minted once and carried? | 🟡 OPEN |
-| Q22 | #296 | A full scan waiting list: scan on the main loop, or answer partial? | 🟡 OPEN |
-| Q23 | #296 | An allocation failure on a worker: exit at once, or the server's own restart? | 🟡 OPEN |
-| Q24 | #253 | The bare `CAP NEW` when the draft-extras flag goes FALSE, and the `bouncer-replay` outer batch | 🟡 OPEN |
-| Q1 | #242 | Accept `+00:00` timestamps? | ✅ RESOLVED: no, spec form only |
+| Q21 | #256 | A reveal JOIN's id and time: derived on every server, or minted once and carried? | ✅ RESOLVED: derived, as built |
+| Q22 | #296 | A full scan waiting list: scan on the main loop, or answer partial? | ✅ RESOLVED: answer partial (`E <reqid> 0 U`) |
+| Q23 | #296 | An allocation failure on a worker: exit at once, or the server's own restart? | ✅ RESOLVED: exit at once (current) |
+| Q24 | #253 | The bare `CAP NEW` when the draft-extras flag goes FALSE, and the `bouncer-replay` outer batch | ✅ RESOLVED: keep the bare NEW and document it; gate the outer batch |
+| Q1 | #242 | Accept `+00:00` timestamps? | ✅ RESOLVED: no, spec form only (unix from clients refused too; the switch is removed) |
 | Q2 | #245 | Session live at a newer build's crash: expire or keep holding? | ✅ RESOLVED: expire (current), no heartbeat work |
 | Q3 | #245 | Restored session whose nick another account holds: skip or fallback nick? | ✅ RESOLVED: skip (current) |
 | Q4 | #246/#247 | Rehash pre-check mechanism | ✅ RESOLVED: child-process check (current), simplified |
@@ -57,7 +57,9 @@ Raised in the 2026-11-18 review. The tip deliberately does not store a `PRIVMSG 
 Our lean: (a). It is the least code, it matches the tip's intent, and it removes the REDACT exposure outright.
 
 ### Q21 · #256 a reveal JOIN's id and time
-Status: 🟡 OPEN
+Status: ✅ RESOLVED (2026-11-18)
+
+**Decision:** derived on every server from its event, as built. It is the simpler of the two and adds nothing to the wire.
 
 - **Derived on every server from its event (current).** One id and time everywhere, 1 ms before the event, with nothing added to the wire; the time is synthetic.
 - **Minted once by the member's server and carried on the line.** A real mint time, at the cost of a tag segment like the earlier `,J`.
@@ -65,7 +67,9 @@ Status: 🟡 OPEN
 Our lean: derived, as built. It needs no wire change and already agrees across mixed builds.
 
 ### Q22 · #296 a full scan waiting list
-Status: 🟡 OPEN
+Status: ✅ RESOLVED (2026-11-18)
+
+**Decision:** a full waiting list answers `E <reqid> 0 U`; the scan is not run on the main loop. Done in #296 f5ee5718.
 
 Past 64 waiting scans:
 - **Scan on the main loop (current).** Complete answers; the stall this PR removes returns under load.
@@ -74,7 +78,9 @@ Past 64 waiting scans:
 Our lean: answer `U`. A partial result that says so beats a stalled server, and #252 now bounds one client to 8 scans.
 
 ### Q23 · #296 an allocation failure on a worker
-Status: 🟡 OPEN
+Status: ✅ RESOLVED (2026-11-18)
+
+**Decision:** the server exits at once and a supervisor restarts it; `server_restart()` is not run from a worker. No change.
 
 - **Exit at once (current).** One syslog line and exit status 1; a supervisor must restart the server.
 - **Keep the server's own restart on that path.** `server_restart()` would run from a worker, which is what the PR stopped.
@@ -82,7 +88,9 @@ Status: 🟡 OPEN
 Our lean: exit at once. Restarting from a worker is not safe, and out of memory is rare.
 
 ### Q24 · #253 two small choices
-Status: 🟡 OPEN
+Status: ✅ RESOLVED (2026-11-18)
+
+**Decision:** both as proposed. The bare `CAP NEW` stays and `readme.features` explains it; the `bouncer-replay` outer batch follows the restore batch's rule (the vendor capability, or the transition flag). Done in #253 c6e57f91.
 
 1. When `PERSISTENCE_DRAFT_EXTRAS` goes FALSE, 302 clients get a bare `CAP NEW :draft/persistence` for the removed value, and may keep the old `attach-cursor`. Keep it and say so in `readme.features` (proposed in the review), or send DEL then NEW, which cancels the capability for everyone.
 2. The auto-replay outer batch `evilnet.github.io/bouncer-replay` is gated on `batch` alone. Gate it on the vendor capability (one condition), or leave it as a batch type clients ignore and fix the comment.
